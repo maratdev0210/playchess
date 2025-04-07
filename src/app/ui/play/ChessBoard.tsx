@@ -2,7 +2,7 @@
 
 // Representation of the chess board
 import { Board, Pieces, IValiPieceMoves } from "@/types/play";
-import { SQUARES } from "chess.js";
+import { SQUARES, Color } from "chess.js";
 import { isSquareAllowed } from "@/lib/isSquareAllowed";
 
 interface IBoard {
@@ -10,6 +10,9 @@ interface IBoard {
   handleBoardClick: (e) => void;
   validPieceMoves: IValiPieceMoves[];
   selectedSquarePosition: string | undefined;
+  selectedPiecePosition: string;
+  isInCheck: boolean;
+  turn: Color;
 }
 
 export default function ChessBoard({
@@ -17,6 +20,9 @@ export default function ChessBoard({
   handleBoardClick,
   validPieceMoves,
   selectedSquarePosition,
+  selectedPiecePosition,
+  isInCheck,
+  turn,
 }: IBoard) {
   console.log(validPieceMoves);
   console.log(board);
@@ -35,11 +41,11 @@ export default function ChessBoard({
                     <div
                       key={colIndex}
                       data-square={SQUARES[rowIndex * 8 + colIndex]}
-                      className={`${(rowIndex + colIndex) % 2 == 0 ? "bg-amber-200" : "bg-amber-700"} relative size-18 flex items-center justify-center`}
+                      className={`${(rowIndex + colIndex) % 2 == 0 ? "bg-amber-200" : "bg-amber-700"} ${selectedPiecePosition == SQUARES[rowIndex * 8 + colIndex] ? "bg-amber-800/75" : ""} relative size-18 flex items-center justify-center`}
                     >
                       {tile !== null && (
                         <img
-                          className={`${selectedSquarePosition !== undefined && selectedSquarePosition == SQUARES[rowIndex * 8 + colIndex] ? "bg-amber-400/90" : ""}`}
+                          className={`${selectedSquarePosition !== undefined && selectedSquarePosition == SQUARES[rowIndex * 8 + colIndex] ? "bg-amber-400/90" : ""} ${isInCheck && tile.type == "k" && tile.color == turn ? "bg-red-500" : ""}`}
                           src={Pieces[tile.type][tile.color]}
                           data-square={tile.square}
                         />

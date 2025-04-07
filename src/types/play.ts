@@ -75,3 +75,38 @@ export interface IPiece {
   type: PieceSymbol;
   color: Color;
 }
+
+export interface GameState {
+  isChecked: boolean; // returns true if the side to mvoe is in check
+  isCheckmated: boolean; // returns true if the side to move is checkmated
+  isDrawn: boolean; // returns true if the game is drawn (50-move rule or insufficient material)
+  isDrawnByFiftyMoves: boolean; // returns true if the game is drawn by 50-move rule
+  isDrawnByMaterial: boolean; // returns true if the game is drawn by insufficient material
+  isStalemate: boolean; // returns true if the side to move has been stalemated
+  isThreeFoldRepetition: boolean; // returns true if the current board position has occured three or more times
+  turn: Color;
+}
+
+// display different type of game messages based on the game state (only works for game that resulted in draw)
+export const GameEndMessages: string[] = [
+  "Draw by 50-moves rule",
+  "Draw by insufficient material",
+  "Stalemate",
+  "Draw by three-fold repetition",
+];
+
+export const drawnStates: string[] = [
+  "isDrawnByFiftyMoves",
+  "isDrawnByMaterial",
+  "isStalemate",
+  "isThreeFoldRepetition",
+];
+
+/* Game sounds: checking the king, ending the game, castling, capturing a piece, moving a piece */
+export enum SOUNDS {
+  CAPTURE = "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/capture.mp3",
+  CASTLE = "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/castle.mp3",
+  MOVESELF = "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-self.mp3",
+  CHECK = "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-check.mp3",
+  GAMEEND = "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-end.mp3",
+}
