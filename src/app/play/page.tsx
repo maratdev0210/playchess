@@ -7,9 +7,10 @@ import {
   Board,
   GameState,
 } from "@/types/play";
-import { Chess } from "chess.js";
+import { Chess, Move } from "chess.js";
 import ChessBoard from "../ui/play/ChessBoard";
 import GameEndAlert from "../ui/play/GameEndAlert";
+import MovesHistory from "../ui/play/MovesHistory";
 import { useState, useEffect, useRef } from "react";
 import { SOUNDS } from "@/types/play";
 import { useGameState } from "@/lib/useGameState";
@@ -31,6 +32,10 @@ export default function Page() {
   const [srcAudio, setSrcAudio] = useState<string | null>(null);
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [playAgain, setPlayAgain] = useState<boolean>(false);
+  const [history, setHistory] = useState<Move[]>([]);
+  const [activeMove, setActiveMove] = useState<number | undefined>();
+  const [boardPositions, setBoardPositions] = useState<IBoard[]>([]); // stores the history of all played moves
+  const [isHistory, setIsHistory] = useState<boolean>(false); // if the value is true, then preview the board not allowing the player to modify the board state
 
   useEffect(() => {
     if (playAgain) {
@@ -50,6 +55,12 @@ export default function Page() {
     turn: "w",
   });
   const gameEndMessage = useGameState(gameState);
+
+  useEffect(() => {
+    if (activeMove + 1 < boardPositions.length) {
+      setIsHistory(true);
+    }
+  }, [activeMove]);
 
   useEffect(() => {
     if (isAudioPlayed && audioRef.current) {
@@ -86,6 +97,9 @@ export default function Page() {
   }, [board]);
 
   const handleBoardClick = (event) => {
+    if (isHistory && activeMove + 1 < boardPositions.length) {
+      return;
+    }
     setSelectedSquarePosition(event.target.dataset.square);
     setValidPieceMoves(
       chess.moves({ square: event.target.dataset.square, verbose: true })
@@ -115,6 +129,9 @@ export default function Page() {
         }
       }
       setBoard(chess.board());
+      setBoardPositions([...boardPositions, chess.board()]);
+      setHistory(chess.history({ verbose: true }));
+      setActiveMove(boardPositions.length);
       setSelectedPiece(undefined);
     }
     if (selectedPiece === undefined) {
@@ -123,18 +140,34 @@ export default function Page() {
     }
   };
 
+  console.log(boardPositions);
+  console.log(isHistory);
+  console.log(activeMove);
+  console.log(history);
+
   return (
     <>
-      <div>Play Game</div>
-      <ChessBoard
-        board={board}
-        handleBoardClick={handleBoardClick}
-        validPieceMoves={validPieceMoves}
-        selectedSquarePosition={selectedSquarePosition}
-        selectedPiecePosition={selectedPiecePosition}
-        isInCheck={gameState.isChecked}
-        turn={gameState.turn}
-      />
+      <div className="relative top-8 md:top-16 md:flex md:justify-center md:items-center gap-8 w-full">
+        <div className="flex justify-center shadow-md rounded-lg">
+          <ChessBoard
+            board={isHistory ? boardPositions[activeMove] : board}
+            handleBoardClick={handleBoardClick}
+            validPieceMoves={validPieceMoves}
+            selectedSquarePosition={selectedSquarePosition}
+            selectedPiecePosition={selectedPiecePosition}
+            isInCheck={gameState.isChecked}
+            turn={gameState.turn}
+          />
+        </div>
+        <div className="flex justify-center right-8 top-8 md:top-0">
+          <MovesHistory
+            history={history}
+            activeMove={activeMove}
+            setActiveMove={setActiveMove}
+          />
+        </div>
+      </div>
+
       <audio className="hidden" ref={audioRef} src={srcAudio} />
       <GameEndAlert
         showMessage={showMessage}

@@ -110,3 +110,35 @@ export enum SOUNDS {
   CHECK = "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-check.mp3",
   GAMEEND = "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-end.mp3",
 }
+
+/* shows the piece icon on the sidebar of played moves */
+export type PieceIcon = {
+  [type in PieceSymbol]: string;
+};
+
+export const PIECEICONS = {
+  p: {
+    w: "",
+    b: "",
+  },
+  n: {
+    w: "\u2658",
+    b: "\u265E",
+  },
+  b: {
+    w: "\u2657",
+    b: "\u265D",
+  },
+  r: {
+    w: "\u2656",
+    b: "\u265C",
+  },
+  q: {
+    w: "\u2655",
+    b: "\u265B",
+  },
+  k: {
+    w: "\u2654",
+    b: "\u265A",
+  },
+};

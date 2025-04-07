@@ -28,20 +28,23 @@ export default function ChessBoard({
   console.log(board);
   return (
     <>
-      <div className="cursor-pointer absolute translate-x-0 -translate-y-1/2 top-1/2 w-full flex items-center justify-center">
+      <div className="cursor-pointer  w-full flex items-center justify-center">
         <div
           onClick={(e) => handleBoardClick(e)}
-          className="w-[576px] h-[576px]"
+          className="w-[192px] h-[192px] md:w-[384px] md:h-[384px] lg:w-[512px] lg:h-[512px] 2xl:w-[576px] 2xl:h-[576px]"
         >
           {board.map((row, rowIndex) => {
             return (
-              <div key={rowIndex} className="w-[576px] h-[72px] flex">
+              <div
+                key={rowIndex}
+                className="w-[192px] h-[24px] md:w-[384px] md:h-[48px] lg:w-[512px] lg:h-[64px] 2xl:w-[576px] 2xl:h-[72px] flex"
+              >
                 {row.map((tile, colIndex) => {
                   return (
                     <div
                       key={colIndex}
                       data-square={SQUARES[rowIndex * 8 + colIndex]}
-                      className={`${(rowIndex + colIndex) % 2 == 0 ? "bg-amber-200" : "bg-amber-700"} ${selectedPiecePosition == SQUARES[rowIndex * 8 + colIndex] ? "bg-amber-800/75" : ""} relative size-18 flex items-center justify-center`}
+                      className={`${(rowIndex + colIndex) % 2 == 0 ? "bg-amber-200" : "bg-amber-700"} ${selectedPiecePosition == SQUARES[rowIndex * 8 + colIndex] ? "bg-amber-800/75" : ""} ${rowIndex == 0 ? "first:rounded-tl-lg last:rounded-tr-lg" : ""} ${rowIndex == 7 ? "first:rounded-bl-lg last:rounded-br-lg" : ""}  relative size-6 md:size-12  lg:size-16 2xl:size-18 flex items-center justify-center`}
                     >
                       {tile !== null && (
                         <img
@@ -56,7 +59,7 @@ export default function ChessBoard({
                       ) && (
                         <span
                           data-square={SQUARES[rowIndex * 8 + colIndex]}
-                          className="rounded-full bg-black/75 size-6 absolute top-1/2 translate-x-0 -translate-y-1/2"
+                          className="rounded-full bg-black/75 size-2  md:size-4 lg:size-5 2xl:size-6 absolute top-1/2 translate-x-0 -translate-y-1/2"
                         ></span>
                       )}
                     </div>
