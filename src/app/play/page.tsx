@@ -113,7 +113,7 @@ export default function Page() {
             chess.get(event.target.dataset.square)?.color !==
               selectedPiece.color
           ) {
-            // the opponent's piece is being capture at this move
+            // the opponent's piece is being captured at this move
             setSrcAudio(SOUNDS.CAPTURE);
             setIsAudioPlayed(true);
           } else if (event.target.dataset.square !== selectedPiecePosition) {
