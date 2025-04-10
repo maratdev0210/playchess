@@ -1,11 +1,12 @@
 "use client";
 
 import { z } from "zod";
-import { signup } from "@/app/actions/auth";
+import { signup, login } from "@/app/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -22,6 +23,7 @@ import {
   FORM_FIELDS,
 } from "@/types/auth";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 // Auth form type: either the signup | login
 interface IAuthForm {
@@ -67,6 +69,12 @@ export default function AuthForm({
       if ("message" in result) {
         setSignupError(result.message);
       }
+    } else {
+      const result = await login(values);
+      if ("message" in result) {
+        toast(result.message);
+      }
+      toast("Logged in successfully");
     }
   }
 

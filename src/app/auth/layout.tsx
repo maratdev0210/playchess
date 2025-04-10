@@ -1,3 +1,5 @@
+import { Toaster } from "sonner";
+
 export default function AuthLayout({
   children,
 }: {
@@ -10,6 +12,7 @@ export default function AuthLayout({
           {children}
         </div>
       </div>
+      <Toaster className="bg-green-500 text-white" />
     </>
   );
 }

@@ -29,3 +29,35 @@ export async function signup(formData: IFormData) {
   await createSession(newUser.id);
   return newUser;
 }
+
+export async function login(formData: IFormData) {
+  const { username, password } = formData;
+
+  const userExist = await prisma.user.findUnique({
+    where: { username },
+  });
+
+  if (!userExist) {
+    return {
+      message: "Incorrect username or password!",
+    };
+  }
+
+  bcrypt.compare(password, userExist.password, (error, res) => {
+    if (error) {
+      console.error("Incorrect username or password!");
+      return;
+    }
+
+    if (res) {
+      return;
+    } else {
+      return {
+        message: "Incorrect username or password!",
+      };
+    }
+  });
+
+  await createSession(userExist.id);
+  return userExist;
+}
