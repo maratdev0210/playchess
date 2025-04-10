@@ -1,9 +1,11 @@
 "use client";
 
 import { z } from "zod";
+import { signup } from "@/app/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import {
   Form,
   FormControl,
@@ -35,6 +37,7 @@ export default function AuthForm({
   authAlternativeText,
   authType,
 }: IAuthForm) {
+  const [signupError, setSignupError] = useState<string>("");
   const formSchema = z.object({
     username: z.string().min(2, {
       message: AUTH_ERRORS["username"][authType],
@@ -57,8 +60,14 @@ export default function AuthForm({
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values); // TO-DO: Add Signup/Login features on the server
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setSignupError("");
+    if (authType === "signup") {
+      const result = await signup(values);
+      if ("message" in result) {
+        setSignupError(result.message);
+      }
+    }
   }
 
   return (
@@ -73,6 +82,7 @@ export default function AuthForm({
           <form
             className="*:cursor-pointer flex flex-col gap-4"
             onSubmit={form.handleSubmit(onSubmit)}
+            method="post"
           >
             {FORM_FIELDS.map((formField, index) => {
               return (
@@ -88,11 +98,20 @@ export default function AuthForm({
                         </span>
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          type={formField == "password" ? "password" : "text"}
-                          placeholder={formField}
-                          {...field}
-                        />
+                        <div>
+                          <Input
+                            type={formField == "password" ? "password" : "text"}
+                            placeholder={formField}
+                            {...field}
+                          />
+                          {formField === "username" && (
+                            <p
+                              className={`${signupError.length > 0 ? "inline-block text-sm text-red-500 transition duration-300" : "hidden"}`}
+                            >
+                              {signupError}
+                            </p>
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
