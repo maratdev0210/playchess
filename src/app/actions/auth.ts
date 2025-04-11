@@ -3,6 +3,7 @@
 import bcrypt from "bcrypt";
 import prisma from "@/lib/prisma";
 import { createSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 
 interface IFormData {
   username: string;
@@ -60,4 +61,8 @@ export async function login(formData: IFormData) {
 
   await createSession(userExist.id);
   return userExist;
+}
+
+export async function redirectLayer() {
+  redirect("/");
 }
