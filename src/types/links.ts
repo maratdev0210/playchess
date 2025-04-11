@@ -18,4 +18,5 @@ export const NAVIGATION_PUBLIC: INavigationPublic = {
 export const NAVIGATION_PRIVATE: INavigationPrivate = {
   Home: "/dashboard",
   Arena: "/arena",
+  Profile: "/profile",
 };
