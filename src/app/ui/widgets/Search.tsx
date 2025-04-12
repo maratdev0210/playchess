@@ -16,6 +16,7 @@ import { Plus, Check } from "lucide-react";
 import { useAppDispatch } from "@/lib/state/hooks";
 import { setSessionData } from "@/lib/state/features/session/sessionSlice";
 import addFriend from "@/app/actions/addFriend";
+import AddFriend from "./AddFriend";
 
 interface IFoundUsers {
   id: number;
@@ -42,7 +43,6 @@ export default function Search({ id }: ISearch) {
   useEffect(() => {
     const retrieveFriendsList = async () => {
       const result = await getFriendsList(id);
-      console.log(result);
       setFriendsList(result);
     };
 
@@ -80,31 +80,11 @@ export default function Search({ id }: ISearch) {
                     <div className="text-sm font-bold flex justify-between items-center">
                       <span>{user.username}</span>
 
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            {friendsList?.includes(user.id) ? (
-                              <span className="text-neutral-500 text-sm">
-                                Friend
-                              </span>
-                            ) : (
-                              <Plus className="text-blue-500 cursor-pointer" />
-                            )}
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {friendsList?.includes(user.id) ? (
-                              <span>You are friends!</span>
-                            ) : (
-                              <span
-                                className="hover:transition hover:duration-300 hover:scale-105"
-                                onClick={() => addFriend(id, user.id)}
-                              >
-                                Add a friend
-                              </span>
-                            )}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <AddFriend
+                        friendsList={friendsList}
+                        userId={id}
+                        friendId={user.id}
+                      />
                     </div>
                     <Separator className="my-2" />
                   </Fragment>

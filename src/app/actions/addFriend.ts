@@ -4,6 +4,7 @@
 import prisma from "@/lib/prisma";
 
 export default async function addFriend(userId: number, friendId: number) {
+  console.log("Handling database updates..");
   if (userId === friendId) {
     return;
   }
