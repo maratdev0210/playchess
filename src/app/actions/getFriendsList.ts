@@ -4,6 +4,7 @@
 import prisma from "@/lib/prisma";
 
 export default async function getFriendsList(id: number) {
+  console.log(id);
   const friendsList = await prisma.user.findUnique({
     where: {
       id: id,

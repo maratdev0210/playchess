@@ -4,18 +4,10 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useState, useEffect, Fragment } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import searchByUsername from "@/app/actions/searchByUsername";
 import getFriendsList from "@/app/actions/getFriendsList";
-import { Plus, Check } from "lucide-react";
 import { useAppDispatch } from "@/lib/state/hooks";
 import { setSessionData } from "@/lib/state/features/session/sessionSlice";
-import addFriend from "@/app/actions/addFriend";
 import AddFriend from "./AddFriend";
 
 interface IFoundUsers {
@@ -41,6 +33,7 @@ export default function Search({ id }: ISearch) {
   }, []);
 
   useEffect(() => {
+
     const retrieveFriendsList = async () => {
       const result = await getFriendsList(id);
       setFriendsList(result);
@@ -60,7 +53,7 @@ export default function Search({ id }: ISearch) {
 
   return (
     <>
-      <div>
+      <div className="px-4 py-2">
         <Input
           value={searchParams}
           onChange={(e) => setSearchParams(e.target.value)}
