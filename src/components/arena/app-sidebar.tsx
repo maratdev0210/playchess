@@ -24,6 +24,14 @@ import { Plus, Minus } from "lucide-react";
 import getFriendsListByName from "@/app/actions/getFriendsListByName";
 import Link from "next/link";
 import { socket } from "../../socket";
+import {
+  selectPlayersData,
+  setInvitedPlayerData,
+  setInviterPlayerData,
+} from "@/lib/state/features/players/playersSlice";
+import { useAppDispatch } from "@/lib/state/hooks";
+import { useAppSelector } from "@/lib/state/hooks";
+import getUserData from "@/app/actions/getUserData";
 
 // define the type returned by calling the getFriendsListName function
 interface IFriendsList {
@@ -41,20 +49,45 @@ export function AppSidebar({ id }: { id: number }) {
   const [friendsListName, setFriendslistName] = useState<
     IFriendsList[] | undefined
   >([]);
+  const [friendsList, setFriendsList] = useState<number[] | undefined>([]);
+  const [invitationReply, setInvitationReply] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const playersData = useAppSelector(selectPlayersData);
 
   useEffect(() => {
     const retrieveFriendsList = async () => {
       const friendsListById = await getFriendsList(id);
       const friendsListByName = await getFriendsListByName(friendsListById);
+      const inviterPlayer = await getUserData(id);
 
       setFriendslistName(friendsListByName);
+      setFriendsList(friendsListById);
+
+      dispatch(
+        setInviterPlayerData({ id: id, username: inviterPlayer.username })
+      );
     };
 
     retrieveFriendsList();
   }, []);
 
-  const handleClick = (friendName: string) => {
+  // socket disconnection after receiving the user's response
+  useEffect(() => {
+    if (invitationReply !== null) {
+      if (invitationReply === "accepted") {
+        console.log("new game starting..");
+        console.log(playersData);
+      }
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [invitationReply]);
+
+  const handleClick = (friendName: string, friendId: number) => {
     console.log("clicked");
+    dispatch(setInvitedPlayerData({ id: friendId, username: friendName }));
     const invitation: Invitation = {
       from: id,
       to: friendName,
@@ -63,6 +96,7 @@ export function AppSidebar({ id }: { id: number }) {
   };
 
   socket.on("replyToInvitation", (reply) => {
+    setInvitationReply(reply);
     console.log("Reply to invitation: " + reply);
   });
 
@@ -121,7 +155,12 @@ export function AppSidebar({ id }: { id: number }) {
                                   </span>
                                 </Link>
                                 <Swords
-                                  onClick={() => handleClick(friend.username)}
+                                  onClick={() =>
+                                    handleClick(
+                                      friend.username,
+                                      friendsList[index]
+                                    )
+                                  }
                                   className="cursor-pointer"
                                 />
                               </div>
