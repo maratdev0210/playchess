@@ -30,6 +30,13 @@ interface IFriendsList {
   username: string;
 }
 
+// object representing the invitation for the game
+// { to: request to the user with whom you want to play}
+interface Invitation {
+  from: number;
+  to: string;
+}
+
 export function AppSidebar({ id }: { id: number }) {
   const [friendsListName, setFriendslistName] = useState<
     IFriendsList[] | undefined
@@ -46,10 +53,18 @@ export function AppSidebar({ id }: { id: number }) {
     retrieveFriendsList();
   }, []);
 
-  const handleClick = () => {
+  const handleClick = (friendName: string) => {
     console.log("clicked");
-    socket.emit("chat message", "value clicked");
+    const invitation: Invitation = {
+      from: id,
+      to: friendName,
+    };
+    socket.emit("invitation", invitation);
   };
+
+  socket.on("replyToInvitation", (reply) => {
+    console.log("Reply to invitation: " + reply);
+  });
 
   return (
     <Sidebar className="top-16 !h-[calc(100svh-32)]">
@@ -106,7 +121,7 @@ export function AppSidebar({ id }: { id: number }) {
                                   </span>
                                 </Link>
                                 <Swords
-                                  onClick={handleClick}
+                                  onClick={() => handleClick(friend.username)}
                                   className="cursor-pointer"
                                 />
                               </div>

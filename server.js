@@ -15,9 +15,16 @@ app.prepare().then(() => {
   const io = new Server(httpServer);
 
   io.on("connection", (socket) => {
-    socket.on("chat message", (msg) => {
-      console.log("message: " + msg);
+    socket.on("invitation", (invitation) => {
+      console.log("invited: " + invitation.to);
+      io.emit("invitation", invitation);
     });
+
+    // reply -> {answer: 'yes' or 'no'} -> either the invited player declines the game or plays the game
+    socket.on("replyToInvitation", (reply) => {
+        console.log("replied to invitation with: " + reply);
+        io.emit("replyToInvitation", reply)
+    })
   });
 
   httpServer
