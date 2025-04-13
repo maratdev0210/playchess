@@ -2,8 +2,8 @@
 
 import { SidebarIcon } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
-import { Button } from "./ui/button";
-import { useSidebar } from "./ui/sidebar";
+import { Button } from "../ui/button";
+import { useSidebar } from "../ui/sidebar";
 import { ReactNode } from "react";
 
 export function SideHeader({ children }: { children: ReactNode }) {

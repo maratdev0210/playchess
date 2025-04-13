@@ -6,7 +6,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarHeader,
@@ -14,27 +13,33 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
-} from "./ui/sidebar";
+} from "../ui/sidebar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Settings, UsersRound } from "lucide-react";
-import { useAppSelector } from "@/lib/state/hooks";
-import { selectSessionData } from "@/lib/state/features/session/sessionSlice";
+import { Settings, UsersRound, Swords } from "lucide-react";
 import { Plus, Minus } from "lucide-react";
+import getFriendsListByName from "@/app/actions/getFriendsListByName";
+import Link from "next/link";
+
+// define the type returned by calling the getFriendsListName function
+interface IFriendsList {
+  username: string;
+}
 
 export function AppSidebar({ id }: { id: number }) {
-  const [friendsList, setFriendsList] = useState<number[] | undefined>([]);
-  const sessionData = useAppSelector(selectSessionData);
+  const [friendsListName, setFriendslistName] = useState<
+    IFriendsList[] | undefined
+  >([]);
 
   useEffect(() => {
     const retrieveFriendsList = async () => {
-      console.log(sessionData);
-      const result = await getFriendsList(id);
+      const friendsListById = await getFriendsList(id);
+      const friendsListByName = await getFriendsListByName(friendsListById);
 
-      setFriendsList(result);
+      setFriendslistName(friendsListByName);
     };
 
     retrieveFriendsList();
@@ -63,7 +68,8 @@ export function AppSidebar({ id }: { id: number }) {
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton>
-                    Settings
+                    <Settings />
+                    <Link href="/profile/settings">Settings</Link>
                     <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
                     <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
                   </SidebarMenuButton>
@@ -74,19 +80,27 @@ export function AppSidebar({ id }: { id: number }) {
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton>
+                    <UsersRound />
                     Friends
                     <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
                     <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
-                {friendsList?.length ? (
+                {friendsListName?.length ? (
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {friendsList.map((friend, index) => {
+                      {friendsListName.map((friend, index) => {
                         return (
                           <SidebarMenuSubItem key={index}>
                             <SidebarMenuSubButton asChild>
-                              <span className="text-sm">{friend}</span>
+                              <div className="flex justify-between">
+                                <Link href={`/arena/${friend.username}`}>
+                                  <span className="text-sm cursor-pointer hover:text-blue-500 hover:transition hover:duration-300">
+                                    {friend.username}
+                                  </span>
+                                </Link>
+                                <Swords className="cursor-pointer" />
+                              </div>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         );

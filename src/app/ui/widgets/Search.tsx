@@ -25,7 +25,7 @@ export default function Search({ id }: ISearch) {
   const [friendsList, setFriendsList] = useState<number[] | undefined>([]); // list of friends of authenticated user
   const dispatch = useAppDispatch();
 
-  // store session data in Rexux
+  // store session data in Redux
   useEffect(() => {
     if (id) {
       dispatch(setSessionData(id));
