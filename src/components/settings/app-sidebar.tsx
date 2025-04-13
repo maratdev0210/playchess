@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Sidebar,
   SidebarContent,
@@ -16,10 +18,10 @@ import { Settings } from "lucide-react";
 
 interface ISidebarData {
   username: string;
-  //setSettingsInterface: React.Dispatch<React.SetStateAction<number>>;
+  setSettingsInterface: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export function AppSidebar({ username }: ISidebarData) {
+export function AppSidebar({ username, setSettingsInterface }: ISidebarData) {
   return (
     <Sidebar className="top-16 !h-[calc(100svh-32)]">
       <SidebarHeader>

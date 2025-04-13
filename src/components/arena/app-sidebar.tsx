@@ -23,6 +23,7 @@ import { Settings, UsersRound, Swords } from "lucide-react";
 import { Plus, Minus } from "lucide-react";
 import getFriendsListByName from "@/app/actions/getFriendsListByName";
 import Link from "next/link";
+import { socket } from "../../socket";
 
 // define the type returned by calling the getFriendsListName function
 interface IFriendsList {
@@ -44,6 +45,11 @@ export function AppSidebar({ id }: { id: number }) {
 
     retrieveFriendsList();
   }, []);
+
+  const handleClick = () => {
+    console.log("clicked");
+    socket.emit("chat message", "value clicked");
+  };
 
   return (
     <Sidebar className="top-16 !h-[calc(100svh-32)]">
@@ -99,7 +105,10 @@ export function AppSidebar({ id }: { id: number }) {
                                     {friend.username}
                                   </span>
                                 </Link>
-                                <Swords className="cursor-pointer" />
+                                <Swords
+                                  onClick={handleClick}
+                                  className="cursor-pointer"
+                                />
                               </div>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
