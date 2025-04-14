@@ -16,15 +16,15 @@ app.prepare().then(() => {
 
   io.on("connection", (socket) => {
     socket.on("invitation", (invitation) => {
-      console.log("invited: " + invitation.to);
-      io.emit("invitation", invitation);
+      console.log(`${invitation.from} invited ${invitation.to} to a game!`);
+      //io.emit("invitation", invitation);
+      socket.broadcast.emit("invitation", invitation);
     });
 
     // reply -> {answer: 'yes' or 'no'} -> either the invited player declines the game or plays the game
     socket.on("replyToInvitation", (reply) => {
-        console.log("replied to invitation with: " + reply);
-        io.emit("replyToInvitation", reply)
-    })
+      io.emit("replyToInvitation", reply);
+    });
   });
 
   httpServer

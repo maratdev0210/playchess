@@ -42,7 +42,7 @@ interface IFriendsList {
 // object representing the invitation for the game
 // { to: request to the user with whom you want to play}
 interface Invitation {
-  from: number;
+  from: string | null;
   to: string;
 }
 
@@ -52,6 +52,7 @@ export function AppSidebar({ id }: { id: number }) {
   >([]);
   const [friendsList, setFriendsList] = useState<number[] | undefined>([]);
   const [invitationReply, setInvitationReply] = useState<string | null>(null);
+  const [inviterUsername, setInviterUsername] = useState<string>("");
   const dispatch = useAppDispatch();
   const playersData = useAppSelector(selectPlayersData);
 
@@ -63,10 +64,8 @@ export function AppSidebar({ id }: { id: number }) {
 
       setFriendslistName(friendsListByName);
       setFriendsList(friendsListById);
-
-      dispatch(
-        setInviterPlayerData({ id: id, username: inviterPlayer.username })
-      );
+      setInviterUsername(inviterPlayer.username);
+      console.log(inviterPlayer);
     };
 
     retrieveFriendsList();
@@ -80,10 +79,6 @@ export function AppSidebar({ id }: { id: number }) {
         console.log(playersData);
       }
     }
-
-    return () => {
-      socket.disconnect();
-    };
   }, [invitationReply]);
 
   const handleLogout = async () => {
@@ -95,15 +90,17 @@ export function AppSidebar({ id }: { id: number }) {
     console.log("clicked");
     dispatch(setInvitedPlayerData({ id: friendId, username: friendName }));
     const invitation: Invitation = {
-      from: id,
+      from: inviterUsername,
       to: friendName,
     };
     socket.emit("invitation", invitation);
   };
 
   socket.on("replyToInvitation", (reply) => {
-    setInvitationReply(reply);
-    console.log("Reply to invitation: " + reply);
+    setInvitationReply(reply.answer);
+    dispatch(setInviterPlayerData({ id: id, username: inviterUsername }));
+    console.log(inviterUsername);
+    console.log("Reply to invitation: " + reply.answer);
   });
 
   return (

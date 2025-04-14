@@ -23,6 +23,7 @@ import {
   FORM_FIELDS,
 } from "@/types/auth";
 import Link from "next/link";
+import { socket } from "../../../socket";
 
 // Auth form type: either the signup | login
 interface IAuthForm {
@@ -68,6 +69,7 @@ export default function AuthForm({
       if ("message" in result) {
         setSignupError(result.message);
       } else {
+        socket.emit("authentication", values.username);
         redirectLayer();
       }
     } else {
@@ -75,6 +77,7 @@ export default function AuthForm({
       if ("message" in result) {
         toast(result.message);
       } else {
+        socket.emit("authentication", values.username);
         redirectLayer();
       }
       toast("Logged in successfully");

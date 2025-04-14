@@ -17,37 +17,41 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+interface InvitationData {
+  from: string;
+  to: string;
+}
+
 export function SideHeader({ children }: { children: ReactNode }) {
   const { toggleSidebar } = useSidebar();
-  const [inviterId, setInviterId] = useState<number | null>(null);
-  const [inviterUsername, setInviterUsername] = useState<string | null>(null);
+  const [invitation, setInvitation] = useState<InvitationData>([]);
   const [isInvited, setIsInvited] = useState<boolean>(false);
 
   useEffect(() => {
-    const retrieveInviterData = async () => {
-      if (inviterId !== null) {
-        const result = await getUserData(inviterId); // retrieve the username of the person who has invited you for a game
-        setInviterUsername(result.username);
-      }
-    };
-
-    retrieveInviterData();
+    console.log("heeyy");
   });
 
   useEffect(() => {
     socket.on("invitation", (invitation) => {
-      setInviterId(invitation.from);
+      setInvitation(invitation);
+      console.log(invitation);
       setIsInvited(true);
-      console.log("You were invited by: " + invitation.from);
+      console.log(`${invitation.from} has invited you to a game!`);
     });
-  });
+  }, []);
 
   const acceptInvite = () => {
-    socket.emit("replyToInvitation", "accepted");
+    socket.emit("replyToInvitation", {
+      to: invitation.from,
+      answer: "accepted",
+    });
   };
 
   const declineInvite = () => {
-    socket.emit("replyToInvitation", "declined");
+    socket.emit("replyToInvitation", {
+      to: invitation.from,
+      answer: "declined",
+    });
   };
 
   return (
@@ -80,7 +84,7 @@ export function SideHeader({ children }: { children: ReactNode }) {
                 {isInvited ? (
                   <div className="flex flex-col gap-1">
                     <span>
-                      {inviterUsername} has invited you to play a game
+                      {invitation.from} has invited you to play a game
                     </span>
                     <div className="flex gap-2 justify-start">
                       <Button
