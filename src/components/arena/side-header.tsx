@@ -52,7 +52,7 @@ export function SideHeader({ children }: { children: ReactNode }) {
 
   return (
     <header className="flex sticky top-0 z-50 w-full items-center border-b bg-background">
-      <div className="flex justify-between h-16 w-full items-center gap-2 px-4 border-1 border-black">
+      <div className="flex justify-between h-16 w-full items-center gap-2 px-4">
         <div className="flex items-center gap-2">
           <Button
             className="h-8 w-8"

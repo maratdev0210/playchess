@@ -19,7 +19,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Settings, UsersRound, Swords } from "lucide-react";
+import { Settings, UsersRound, Swords, LogOut } from "lucide-react";
 import { Plus, Minus } from "lucide-react";
 import getFriendsListByName from "@/app/actions/getFriendsListByName";
 import Link from "next/link";
@@ -32,6 +32,7 @@ import {
 import { useAppDispatch } from "@/lib/state/hooks";
 import { useAppSelector } from "@/lib/state/hooks";
 import getUserData from "@/app/actions/getUserData";
+import { logout } from "@/app/actions/auth";
 
 // define the type returned by calling the getFriendsListName function
 interface IFriendsList {
@@ -85,7 +86,12 @@ export function AppSidebar({ id }: { id: number }) {
     };
   }, [invitationReply]);
 
-  const handleClick = (friendName: string, friendId: number) => {
+  const handleLogout = async () => {
+    const result = await logout();
+    console.log(result);
+  };
+
+  const handleInvitationClick = (friendName: string, friendId: number) => {
     console.log("clicked");
     dispatch(setInvitedPlayerData({ id: friendId, username: friendName }));
     const invitation: Invitation = {
@@ -156,7 +162,7 @@ export function AppSidebar({ id }: { id: number }) {
                                 </Link>
                                 <Swords
                                   onClick={() =>
-                                    handleClick(
+                                    handleInvitationClick(
                                       friend.username,
                                       friendsList[index]
                                     )
@@ -171,6 +177,16 @@ export function AppSidebar({ id }: { id: number }) {
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 ) : null}
+              </SidebarMenuItem>
+            </Collapsible>
+            <Collapsible className="group/collapsible">
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton onClick={() => handleLogout()}>
+                    <LogOut className="hover:cursor-pointer" />
+                    <span className="hover:cursor-pointer">Log out</span>
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
               </SidebarMenuItem>
             </Collapsible>
           </SidebarMenu>
