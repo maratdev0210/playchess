@@ -11,9 +11,10 @@ export default async function Page({
   const session = await decrypt(cookie);
 
   const { game } = await params;
+
   return (
     <>
-      <Play id={session.userId} />
+      <Play gameId={game} />
     </>
   );
 }

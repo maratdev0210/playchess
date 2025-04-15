@@ -23,7 +23,7 @@ app.prepare().then(() => {
 
     // reply -> {answer: 'yes' or 'no'} -> either the invited player declines the game or plays the game
     socket.on("replyToInvitation", (reply) => {
-      io.emit("replyToInvitation", reply);
+      socket.broadcast.emit("replyToInvitation", reply);
     });
   });
 

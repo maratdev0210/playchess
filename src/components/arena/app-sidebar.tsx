@@ -34,7 +34,10 @@ import { useAppSelector } from "@/lib/state/hooks";
 import getUserData from "@/app/actions/getUserData";
 import { logout } from "@/app/actions/auth";
 import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
+import gamesCount from "@/app/actions/gamesCount";
+import createGame from "@/app/actions/createGame";
 
 // define the type returned by calling the getFriendsListName function
 interface IFriendsList {
@@ -76,17 +79,28 @@ export function AppSidebar({ id }: { id: number }) {
   }, []);
 
   useEffect(() => {
-    if (invitationReply !== null) {
-      if (invitationReply === "accepted") {
-        dispatch(
-          setInvitedPlayerData({
-            id: invitedPlayerId,
-            username: invitedPlayerUsername,
-          })
-        );
-        redirect(`play/${"game1"}`);
+    const createNewGame = async () => {
+      if (invitationReply !== null) {
+        if (invitationReply === "accepted") {
+          dispatch(
+            setInvitedPlayerData({
+              id: invitedPlayerId,
+              username: invitedPlayerUsername,
+            })
+          );
+          const gameId = await gamesCount();
+          const newGame = await createGame(
+            inviterUsername,
+            invitedPlayerUsername,
+            String(gameId)
+          );
+          console.log(newGame);
+          redirect(`/play/${String(gameId)}`);
+        }
       }
-    }
+    };
+
+    createNewGame();
   }, [invitationReply]);
 
   const handleLogout = async () => {
@@ -106,8 +120,11 @@ export function AppSidebar({ id }: { id: number }) {
     socket.emit("invitation", invitation);
   };
 
-  socket.on("replyToInvitation", (reply) => {
-    setInvitationReply(reply.answer);
+  useEffect(() => {
+    socket.on("replyToInvitation", (reply) => {
+      setInvitationReply(reply.answer);
+      console.log("received the reply");
+    });
   });
 
   return (

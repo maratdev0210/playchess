@@ -21,6 +21,8 @@ import {
   setInvitedPlayerData,
   setInviterPlayerData,
 } from "@/lib/state/features/players/playersSlice";
+import { redirect } from "next/navigation";
+import gamesCount from "@/app/actions/gamesCount";
 
 interface InvitationData {
   from: string;
@@ -70,11 +72,13 @@ export function SideHeader({
     retrieveUserData();
   });
 
-  const acceptInvite = () => {
+  const acceptInvite = async () => {
     socket.emit("replyToInvitation", {
       to: invitation.from,
       answer: "accepted",
     });
+    const gameId = await gamesCount();
+    redirect(`/play/${String(gameId)}`);
   };
 
   const declineInvite = () => {
