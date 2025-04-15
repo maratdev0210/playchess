@@ -157,6 +157,7 @@ export default function Page() {
             selectedPiecePosition={selectedPiecePosition}
             isInCheck={gameState.isChecked}
             turn={gameState.turn}
+            view="black"
           />
         </div>
         <div className="flex justify-center right-8 top-8 md:top-0">

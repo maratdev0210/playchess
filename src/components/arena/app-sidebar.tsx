@@ -33,6 +33,8 @@ import { useAppDispatch } from "@/lib/state/hooks";
 import { useAppSelector } from "@/lib/state/hooks";
 import getUserData from "@/app/actions/getUserData";
 import { logout } from "@/app/actions/auth";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 // define the type returned by calling the getFriendsListName function
 interface IFriendsList {
@@ -53,6 +55,9 @@ export function AppSidebar({ id }: { id: number }) {
   const [friendsList, setFriendsList] = useState<number[] | undefined>([]);
   const [invitationReply, setInvitationReply] = useState<string | null>(null);
   const [inviterUsername, setInviterUsername] = useState<string>("");
+  const [invitedPlayerId, setInvitedPlayerId] = useState<number>(0);
+  const [invitedPlayerUsername, setInvitedPlayerUsername] =
+    useState<string>("");
   const dispatch = useAppDispatch();
   const playersData = useAppSelector(selectPlayersData);
 
@@ -65,30 +70,35 @@ export function AppSidebar({ id }: { id: number }) {
       setFriendslistName(friendsListByName);
       setFriendsList(friendsListById);
       setInviterUsername(inviterPlayer.username);
-      console.log(inviterPlayer);
     };
 
     retrieveFriendsList();
   }, []);
 
-  // socket disconnection after receiving the user's response
   useEffect(() => {
     if (invitationReply !== null) {
       if (invitationReply === "accepted") {
-        console.log("new game starting..");
-        console.log(playersData);
+        dispatch(
+          setInvitedPlayerData({
+            id: invitedPlayerId,
+            username: invitedPlayerUsername,
+          })
+        );
+        redirect(`play/${"game1"}`);
       }
     }
   }, [invitationReply]);
 
   const handleLogout = async () => {
-    const result = await logout();
-    console.log(result);
+    await logout();
   };
 
-  const handleInvitationClick = (friendName: string, friendId: number) => {
-    console.log("clicked");
-    dispatch(setInvitedPlayerData({ id: friendId, username: friendName }));
+  const handleInvitationClick = async (
+    friendName: string,
+    friendId: number
+  ) => {
+    setInvitedPlayerId(friendId);
+    setInvitedPlayerUsername(friendName);
     const invitation: Invitation = {
       from: inviterUsername,
       to: friendName,
@@ -98,9 +108,6 @@ export function AppSidebar({ id }: { id: number }) {
 
   socket.on("replyToInvitation", (reply) => {
     setInvitationReply(reply.answer);
-    dispatch(setInviterPlayerData({ id: id, username: inviterUsername }));
-    console.log(inviterUsername);
-    console.log("Reply to invitation: " + reply.answer);
   });
 
   return (

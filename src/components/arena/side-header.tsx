@@ -16,29 +16,59 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAppDispatch } from "@/lib/state/hooks";
+import {
+  setInvitedPlayerData,
+  setInviterPlayerData,
+} from "@/lib/state/features/players/playersSlice";
 
 interface InvitationData {
   from: string;
   to: string;
 }
 
-export function SideHeader({ children }: { children: ReactNode }) {
+export function SideHeader({
+  children,
+  id,
+}: {
+  children: ReactNode;
+  id: number;
+}) {
   const { toggleSidebar } = useSidebar();
   const [invitation, setInvitation] = useState<InvitationData>([]);
   const [isInvited, setIsInvited] = useState<boolean>(false);
-
-  useEffect(() => {
-    console.log("heeyy");
-  });
+  const [username, setUsername] = useState<string>("");
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     socket.on("invitation", (invitation) => {
       setInvitation(invitation);
-      console.log(invitation);
       setIsInvited(true);
-      console.log(`${invitation.from} has invited you to a game!`);
+      console.log(id);
+      console.log(username);
+      dispatch(
+        setInvitedPlayerData({
+          id: id,
+          username: username,
+        })
+      );
+      dispatch(
+        setInviterPlayerData({
+          id: 0,
+          username: invitation.from,
+        })
+      );
     });
   }, []);
+
+  useEffect(() => {
+    const retrieveUserData = async () => {
+      const result = await getUserData(id);
+      setUsername(result.username);
+    };
+
+    retrieveUserData();
+  });
 
   const acceptInvite = () => {
     socket.emit("replyToInvitation", {

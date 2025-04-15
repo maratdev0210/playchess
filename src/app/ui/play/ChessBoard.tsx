@@ -13,6 +13,7 @@ interface IBoard {
   selectedPiecePosition: string;
   isInCheck: boolean;
   turn: Color;
+  view: string; // player's point of view of a chessboard: either as white or as black
 }
 
 export default function ChessBoard({
@@ -23,6 +24,7 @@ export default function ChessBoard({
   selectedPiecePosition,
   isInCheck,
   turn,
+  view,
 }: IBoard) {
   console.log(validPieceMoves);
   console.log(board);

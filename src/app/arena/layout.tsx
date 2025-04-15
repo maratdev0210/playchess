@@ -16,7 +16,7 @@ export default async function ArenaLayout({
   return (
     <div>
       <SidebarProvider className="flex flex-col">
-        <SideHeader>
+        <SideHeader id={session.userId}>
           <Navigation />
         </SideHeader>
         <div className="flex flex-1">

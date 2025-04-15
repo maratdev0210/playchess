@@ -14,3 +14,12 @@ model User {
   password String
   friends Int[]
 }
+
+model Game {
+  id Int @id @default(autoincrement())
+  white String 
+  black String 
+  moves Json
+  result String
+  isActive Boolean 
+}
