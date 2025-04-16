@@ -14,7 +14,7 @@ export default async function Page({
 
   return (
     <>
-      <Play gameId={game} />
+      <Play gameId={game} userId={session.userId} />
     </>
   );
 }

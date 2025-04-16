@@ -27,7 +27,6 @@ import { socket } from "../../socket";
 import {
   selectPlayersData,
   setInvitedPlayerData,
-  setInviterPlayerData,
 } from "@/lib/state/features/players/playersSlice";
 import { useAppDispatch } from "@/lib/state/hooks";
 import { useAppSelector } from "@/lib/state/hooks";
@@ -35,7 +34,6 @@ import getUserData from "@/app/actions/getUserData";
 import { logout } from "@/app/actions/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
 import gamesCount from "@/app/actions/gamesCount";
 import createGame from "@/app/actions/createGame";
 
@@ -62,7 +60,6 @@ export function AppSidebar({ id }: { id: number }) {
   const [invitedPlayerUsername, setInvitedPlayerUsername] =
     useState<string>("");
   const dispatch = useAppDispatch();
-  const playersData = useAppSelector(selectPlayersData);
 
   useEffect(() => {
     const retrieveFriendsList = async () => {
