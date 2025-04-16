@@ -58,16 +58,35 @@ export default function Play({
       // preload the moves that have been played if any
       if (result !== null && result.moves !== null) {
         setGameData(result);
-        const movesHistory = result.moves;
+        const movesHistory = JSON.parse(result.moves);
+
         if (JSON.stringify(movesHistory) !== "{}") {
           // the game has at least one moves
           // so we have to restore it
-          console.log("moves history is non-empty");
+
+          setHistory(movesHistory);
+          movesHistory.map((pastMove) => {
+            chess.move({
+              from: pastMove.from,
+              to: pastMove.to,
+            });
+          });
+          setBoard(chess.board());
         }
       }
     };
 
     retrieveGameData();
+  }, []);
+
+  useEffect(() => {
+    const updatedGame = async () => {
+      const gameHistory = JSON.stringify(chess.history({ verbose: true }));
+      const result = await updateGame(gameId, gameHistory);
+    
+    };
+
+    updatedGame();
   }, []);
 
   useEffect(() => {
@@ -189,7 +208,7 @@ export default function Play({
     const updatedGame = async () => {
       const gameHistory = JSON.stringify(chess.history({ verbose: true }));
       const result = await updateGame(gameId, gameHistory);
-      console.log(result);
+    
     };
 
     updatedGame();
@@ -199,8 +218,7 @@ export default function Play({
     const retreiveGameData = async () => {
       const result = await getGameData(gameId);
 
-      //console.log("Game Data: " + result);
-      console.log(JSON.parse(result.moves));
+      
     };
 
     retreiveGameData();
