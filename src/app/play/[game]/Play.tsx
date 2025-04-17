@@ -21,6 +21,7 @@ import { useGameState } from "@/lib/useGameState";
 import { SOUNDS } from "@/types/play";
 import updateGame from "@/app/actions/updateGame";
 import { socket } from "@/socket";
+import ChessBoardReversed from "@/app/ui/play/ChessBoardReversed";
 
 type IBoard = (Board | null)[][];
 const chess = new Chess(DEFAULT_POSITION, { skipValidation: false });
@@ -53,12 +54,19 @@ export default function Play({
   const [activeMove, setActiveMove] = useState<number | undefined>();
   const [boardPositions, setBoardPositions] = useState<IBoard[]>([]); // stores the history of all played moves
   const [isHistory, setIsHistory] = useState<boolean>(false); // if the value is true, then preview the board not allowing the player to modify the board state
+  const [boardView, setBoardView] = useState<string>("white"); // default board view
   useEffect(() => {
     const retrieveGameData = async () => {
       const result = await getGameData(gameId);
+      const userData = await getUserData(userId);
+      setUsername(userData.username);
       // preload the moves that have been played if any
       if (result !== null && result.moves !== null) {
         setGameData(result);
+        // change the board view if the user is playing for black
+        if (userData.username === result.black) {
+          setBoardView("black");
+        }
         const movesHistory = JSON.parse(result.moves);
 
         if (JSON.stringify(movesHistory) !== "{}") {
@@ -84,11 +92,17 @@ export default function Play({
     socket.on("whiteMove", (move) => {
       chess.move(move);
       setBoard(chess.board());
+      setBoardPositions([...boardPositions, chess.board()]);
+      setHistory(chess.history({ verbose: true }));
+      setActiveMove(boardPositions.length);
     });
 
     socket.on("blackMove", (move) => {
       chess.move(move);
       setBoard(chess.board());
+      setBoardPositions([...boardPositions, chess.board()]);
+      setHistory(chess.history({ verbose: true }));
+      setActiveMove(boardPositions.length);
     });
   });
 
@@ -101,14 +115,14 @@ export default function Play({
     updatedGame();
   }, []);
 
-  useEffect(() => {
-    const retrieveUserData = async () => {
-      const userData = await getUserData(userId);
-      setUsername(userData.username);
-    };
+  // useEffect(() => {
+  //   const retrieveUserData = async () => {
+  //     const userData = await getUserData(userId);
+  //     setUsername(userData.username);
+  //   };
 
-    retrieveUserData();
-  }, []);
+  //   retrieveUserData();
+  // }, []);
 
   useEffect(() => {
     if (playAgain) {
@@ -253,16 +267,27 @@ export default function Play({
     <>
       <div className="relative top-8 md:top-16 md:flex md:justify-center md:items-center gap-8 w-full">
         <div className="flex justify-center shadow-md rounded-lg">
-          <ChessBoard
-            board={isHistory ? boardPositions[activeMove] : board}
-            handleBoardClick={handleBoardClick}
-            validPieceMoves={validPieceMoves}
-            selectedSquarePosition={selectedSquarePosition}
-            selectedPiecePosition={selectedPiecePosition}
-            isInCheck={gameState.isChecked}
-            turn={gameState.turn}
-            view="black"
-          />
+          {boardView === "white" ? (
+            <ChessBoard
+              board={isHistory ? boardPositions[activeMove] : board}
+              handleBoardClick={handleBoardClick}
+              validPieceMoves={validPieceMoves}
+              selectedSquarePosition={selectedSquarePosition}
+              selectedPiecePosition={selectedPiecePosition}
+              isInCheck={gameState.isChecked}
+              turn={gameState.turn}
+            />
+          ) : (
+            <ChessBoardReversed
+              board={isHistory ? boardPositions[activeMove] : board}
+              handleBoardClick={handleBoardClick}
+              validPieceMoves={validPieceMoves}
+              selectedSquarePosition={selectedSquarePosition}
+              selectedPiecePosition={selectedPiecePosition}
+              isInCheck={gameState.isChecked}
+              turn={gameState.turn}
+            />
+          )}
         </div>
         <div className="flex justify-center right-8 top-8 md:top-0">
           <MovesHistory
