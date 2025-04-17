@@ -55,6 +55,7 @@ export default function Play({
   const [boardPositions, setBoardPositions] = useState<IBoard[]>([]); // stores the history of all played moves
   const [isHistory, setIsHistory] = useState<boolean>(false); // if the value is true, then preview the board not allowing the player to modify the board state
   const [boardView, setBoardView] = useState<string>("white"); // default board view
+  const [opponentUsername, setOpponentUsername] = useState<string>("");
   useEffect(() => {
     const retrieveGameData = async () => {
       const result = await getGameData(gameId);
@@ -66,6 +67,9 @@ export default function Play({
         // change the board view if the user is playing for black
         if (userData.username === result.black) {
           setBoardView("black");
+          setOpponentUsername(result.white);
+        } else {
+          setOpponentUsername(result.black);
         }
         const movesHistory = JSON.parse(result.moves);
 
@@ -114,15 +118,6 @@ export default function Play({
 
     updatedGame();
   }, []);
-
-  // useEffect(() => {
-  //   const retrieveUserData = async () => {
-  //     const userData = await getUserData(userId);
-  //     setUsername(userData.username);
-  //   };
-
-  //   retrieveUserData();
-  // }, []);
 
   useEffect(() => {
     if (playAgain) {
@@ -294,6 +289,8 @@ export default function Play({
             history={history}
             activeMove={activeMove}
             setActiveMove={setActiveMove}
+            opponent={opponentUsername}
+            player={username}
           />
         </div>
       </div>
