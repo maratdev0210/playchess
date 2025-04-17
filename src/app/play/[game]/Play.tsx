@@ -20,6 +20,7 @@ import GameEndAlert from "@/app/ui/play/GameEndAlert";
 import { useGameState } from "@/lib/useGameState";
 import { SOUNDS } from "@/types/play";
 import updateGame from "@/app/actions/updateGame";
+import { socket } from "@/socket";
 
 type IBoard = (Board | null)[][];
 const chess = new Chess(DEFAULT_POSITION, { skipValidation: false });
@@ -80,10 +81,21 @@ export default function Play({
   }, []);
 
   useEffect(() => {
+    socket.on("whiteMove", (move) => {
+      chess.move(move);
+      setBoard(chess.board());
+    });
+
+    socket.on("blackMove", (move) => {
+      chess.move(move);
+      setBoard(chess.board());
+    });
+  });
+
+  useEffect(() => {
     const updatedGame = async () => {
       const gameHistory = JSON.stringify(chess.history({ verbose: true }));
       const result = await updateGame(gameId, gameHistory);
-    
     };
 
     updatedGame();
@@ -182,6 +194,17 @@ export default function Play({
             setSrcAudio(SOUNDS.MOVESELF);
             setIsAudioPlayed(true);
           }
+          if (chess.turn() === "w") {
+            socket.emit("whiteMove", {
+              from: selectedPiecePosition,
+              to: event.target.dataset.square,
+            });
+          } else {
+            socket.emit("blackMove", {
+              from: selectedPiecePosition,
+              to: event.target.dataset.square,
+            });
+          }
           chess.move({
             from: selectedPiecePosition,
             to: event.target.dataset.square,
@@ -190,7 +213,7 @@ export default function Play({
           console.log(error);
         }
       }
-      // TO-DO: Update the Game database record here
+
       setBoard(chess.board());
       setBoardPositions([...boardPositions, chess.board()]);
       setHistory(chess.history({ verbose: true }));
@@ -208,7 +231,6 @@ export default function Play({
     const updatedGame = async () => {
       const gameHistory = JSON.stringify(chess.history({ verbose: true }));
       const result = await updateGame(gameId, gameHistory);
-    
     };
 
     updatedGame();
@@ -217,8 +239,6 @@ export default function Play({
   useEffect(() => {
     const retreiveGameData = async () => {
       const result = await getGameData(gameId);
-
-      
     };
 
     retreiveGameData();
