@@ -28,14 +28,19 @@ app.prepare().then(() => {
 
     // chess moves
     socket.on("whiteMove", (move) => {
-      console.log('white made a move!');
+      console.log("white made a move!");
       socket.broadcast.emit("whiteMove", move);
-    })
+    });
 
     socket.on("blackMove", (move) => {
       console.log("black made a move");
       socket.broadcast.emit("blackMove", move);
-    })
+    });
+
+    socket.on("resignation", (from) => {
+      console.log(`${from} has resigned!`);
+      socket.emit("resignation", from);
+    });
   });
 
   httpServer

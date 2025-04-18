@@ -1,9 +1,10 @@
 // display the moves history on a sidebar
 
-import { Rewind, SkipForward } from "lucide-react";
+import { Rewind, SkipForward, Repeat2, Flag } from "lucide-react";
 import ShowMoves from "@/app/widgets/play/ShowMoves";
 import { Move } from "chess.js";
 import Link from "next/link";
+import React from "react";
 
 interface IMovesHistory {
   history: Move[];
@@ -11,6 +12,9 @@ interface IMovesHistory {
   setActiveMove: React.Dispatch<React.SetStateAction<number | undefined>>;
   opponent: string; // opponent's username of a player
   player: string;
+  boardView: string;
+  setBoardView: React.Dispatch<React.SetStateAction<string>>;
+  setGameActionType: React.Dispatch<React.SetStateAction<string>>; // choose the option to resign or offer the draw
 }
 
 export default function MovesHistory({
@@ -19,6 +23,9 @@ export default function MovesHistory({
   setActiveMove,
   opponent,
   player,
+  boardView,
+  setBoardView,
+  setGameActionType,
 }: IMovesHistory) {
   return (
     <>
@@ -49,10 +56,40 @@ export default function MovesHistory({
             setActiveMove={setActiveMove}
           />
         </div>
-        <div className="pb-2 px-4">
+        <div className="pb-2 px-4 flex justify-between items-center gap-2">
           <Link href={`/arena/${player}`}>
             <span className="text-gray-700 text-lg">{player}</span>
           </Link>
+          <div className="flex gap-1">
+            <div title="flip the board">
+              <Repeat2
+                onClick={() =>
+                  setBoardView(boardView === "black" ? "white" : "black")
+                }
+                className="text-gray-500 cursor-pointer hover:transition hover:duration-300 hover:scale-105"
+              />
+            </div>
+            <div title="Resign">
+              <Flag
+                onClick={() => setGameActionType("resign")}
+                className="text-gray-500 cursor-pointer scale-80 hover:transition hover:duration hover:scale-90"
+              />
+            </div>
+            <div
+              title="Offer draw relative"
+              onClick={() => setGameActionType("draw")}
+            >
+              <span className="cursor-pointer hover:transition hover:duration-300 hover:scale-105 relative bottom-0.5 font-semibold inline-block text-gray-500">
+                1
+              </span>
+              <span className="cursor-pointer text-gray-500 font-semibold hover:transition hover:duration-300 hover:scale-105 inline-block">
+                /
+              </span>
+              <span className="cursor-pointer relative top-0.5 font-semibold text-gray-500 hover:transition hover:duration-300 hover:scale-105 inline-block">
+                2
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </>

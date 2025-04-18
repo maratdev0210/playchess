@@ -18,10 +18,13 @@ import ChessBoard from "@/app/ui/play/ChessBoard";
 import MovesHistory from "@/app/ui/play/MovesHistory";
 import GameEndAlert from "@/app/ui/play/GameEndAlert";
 import { useGameState } from "@/lib/useGameState";
-import { SOUNDS } from "@/types/play";
+import { SOUNDS, IGameActionResponse, GAME_RESIGNATION } from "@/types/play";
 import updateGame from "@/app/actions/updateGame";
 import { socket } from "@/socket";
 import ChessBoardReversed from "@/app/ui/play/ChessBoardReversed";
+import GameAction from "@/app/ui/play/GameAction";
+import ManualGameEndAlert from "@/app/ui/play/ManualGameEndAlert";
+import updateGameEndResults from "@/app/actions/updateGameResults";
 
 type IBoard = (Board | null)[][];
 const chess = new Chess(DEFAULT_POSITION, { skipValidation: false });
@@ -56,6 +59,13 @@ export default function Play({
   const [isHistory, setIsHistory] = useState<boolean>(false); // if the value is true, then preview the board not allowing the player to modify the board state
   const [boardView, setBoardView] = useState<string>("white"); // default board view
   const [opponentUsername, setOpponentUsername] = useState<string>("");
+  const [gameActionType, setGameActionType] = useState<string>(""); // resign or draw option
+  const [showGameAction, setShowGameAction] = useState<boolean>(false);
+  const [gameActionResponse, setGameActionResponse] =
+    useState<IGameActionResponse | null>(null);
+  const [showGameEndALert, setShowGameEndAlert] = useState<boolean>(false);
+  const [gameEndResult, setGameEndResult] = useState<string>("");
+
   useEffect(() => {
     const retrieveGameData = async () => {
       const result = await getGameData(gameId);
@@ -208,7 +218,7 @@ export default function Play({
               from: selectedPiecePosition,
               to: event.target.dataset.square,
             });
-          } else {
+          } else if (chess.turn() === "b") {
             socket.emit("blackMove", {
               from: selectedPiecePosition,
               to: event.target.dataset.square,
@@ -253,6 +263,44 @@ export default function Play({
     retreiveGameData();
   }, [board]);
 
+  useEffect(() => {
+    if (gameActionType !== "") {
+      setShowGameAction(true);
+    }
+  }, [gameActionType]);
+
+  useEffect(() => {
+    if (gameActionResponse !== null) {
+      if (
+        gameActionResponse.type === "resign" &&
+        gameActionResponse.response === "confirmed" &&
+        gameData !== null
+      ) {
+        // white resigns the game
+        if (gameData.white === username) {
+          socket.emit("resignation", {
+            from: "white",
+          });
+        } else {
+          // black resigns the game
+          socket.emit("resignation", {
+            from: "black",
+          });
+        }
+      }
+    }
+  }, [gameActionResponse]);
+
+  useEffect(() => {
+    // from shows which side resigned the game
+    socket.on("resignation", (from) => {
+      setShowGameEndAlert(true);
+      setGameEndResult(GAME_RESIGNATION[from.from].message);
+      updateGameEndResults(GAME_RESIGNATION[from.from].result, gameId);
+      console.log(`${from.from} has resigned!`);
+    });
+  });
+
   console.log(boardPositions);
   console.log(isHistory);
   console.log(activeMove);
@@ -291,6 +339,9 @@ export default function Play({
             setActiveMove={setActiveMove}
             opponent={opponentUsername}
             player={username}
+            boardView={boardView}
+            setBoardView={setBoardView}
+            setGameActionType={setGameActionType}
           />
         </div>
       </div>
@@ -301,6 +352,18 @@ export default function Play({
         text={gameEndMessage}
         setShowMessage={setShowMessage}
         setPlayAgain={setPlayAgain}
+      />
+      <GameAction
+        type={gameActionType}
+        showGameAction={showGameAction}
+        setShowGameAction={setShowGameAction}
+        setGameActionResponse={setGameActionResponse}
+        setGameActionType={setGameActionType}
+      />
+      <ManualGameEndAlert
+        showGameEndALert={showGameEndALert}
+        setShowGameEndAlert={setShowGameEndAlert}
+        text={gameEndResult}
       />
     </>
   );

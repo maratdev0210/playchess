@@ -142,3 +142,41 @@ export const PIECEICONS = {
     b: "\u265A",
   },
 };
+
+// Action messages displayed in alert dialogs
+// Example: Resign the game, or offer the draw
+
+export interface IGameAction {
+  [key: string]: string;
+}
+
+export const GAME_ACTIONS: IGameAction = {
+  resign: "Are you sure you want to resign?",
+  draw: "Are you sure you want to offer draw?",
+};
+
+export interface IGameActionResponse {
+  type: string;
+  response: string;
+}
+
+export type IGameResignationData = {
+  message: string;
+  result: string;
+};
+
+// define the game resignation messages and results
+export interface IGameResignation {
+  [key: string]: IGameResignationData;
+}
+
+export const GAME_RESIGNATION: IGameResignation = {
+  white: {
+    message: "Black won by resignation!",
+    result: "0-1",
+  },
+  black: {
+    message: "White won by resignation!",
+    result: "1-0",
+  },
+};
