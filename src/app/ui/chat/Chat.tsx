@@ -20,41 +20,60 @@ export default function Chat({ username, gameId }: IChat) {
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<IMessage[]>([]);
 
-  socket.on("sendMessage", (data) => {
-    const updateMessage = messages;
-    updateMessage.push(data);
-    addMessage(gameId, JSON.stringify(updateMessage));
-  });
+  useEffect(() => {
+    socket.on("sendMessage", (data) => {
+      const retrieveData = async () => {
+        const gameData = await getGameData(gameId);
+        if (gameData.messages !== null) {
+          setMessages(gameData.messages);
+        }
+      };
 
+      retrieveData();
+    });
+
+    return () => {
+      socket.off("sendMessage");
+    };
+  }, []);
+
+  // load the message history on page refresh
   useEffect(() => {
     const retrieveGameData = async () => {
       const gameData = await getGameData(gameId);
-      console.log(gameData);
+
       if (gameData.messages !== null) {
-        console.log(JSON.parse(gameData.messages));
-        setMessages(JSON.parse(gameData.messages));
+        setMessages(gameData.messages);
       }
     };
 
     retrieveGameData();
-  });
+  }, []);
 
   const sendMessageOnEnter = (event) => {
     if (event.code === "Enter" && message !== "") {
       // send the message if the message is not empty
       socket.emit("sendMessage", { username: username, content: message });
+      const updateMessage = messages;
+      updateMessage.push({ username: username, content: message });
+      addMessage(gameId, updateMessage);
+      setMessage("");
     }
   };
 
   // send message on button click
   const sendMessage = () => {
     socket.emit("sendMessage", { username: username, content: message });
+    const updateMessage = messages;
+    updateMessage.push({ username: username, content: message });
+    addMessage(gameId, updateMessage);
+    setMessage("");
   };
 
   return (
     <>
-      <div className="w-90 h-110 overflow-auto rounded-md flex flex-col justify-between bg-gray-50 border-gray-300 border-1 relative">
-        <div>
+      <div className="w-90 h-110  rounded-md flex flex-col justify-between bg-gray-50 border-gray-300 border-1 relative">
+        <div className="overflow-auto scrollbar">
           <div className="h-10 bg-black w-full flex items-center justify-center">
             <span className="text-center text-white block">Chat Room</span>
           </div>
@@ -66,14 +85,20 @@ export default function Chat({ username, gameId }: IChat) {
                     className="flex gap-2 py-0.5 items-center justify-between"
                     key={index}
                   >
-                    <Link href={`/arena/${message.username}`}>
-                      <span className="text-gray-600 text-sm font-bold">
-                        {message.username}
-                      </span>
-                    </Link>
-                    <span className="text-gray-500 font-semibold text-sm block">
-                      {message.content}
-                    </span>
+                    {message.username === "SYSTEM_MESSAGE" ? (
+                      <p className="text-center">{message.content}</p>
+                    ) : (
+                      <>
+                        <Link href={`/arena/${message.username}`}>
+                          <span className="text-gray-600 text-sm font-bold">
+                            {message.username}
+                          </span>
+                        </Link>
+                        <span className="text-gray-500 font-semibold text-sm block">
+                          {message.content}
+                        </span>
+                      </>
+                    )}
                   </div>
                 );
               })}

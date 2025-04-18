@@ -74,6 +74,7 @@ export default function Play({
       // preload the moves that have been played if any
       if (result !== null && result.moves !== null) {
         setGameData(result);
+        setMessages(result.messages);
         // change the board view if the user is playing for black
         if (userData.username === result.black) {
           setBoardView("black");
@@ -297,7 +298,6 @@ export default function Play({
       setShowGameEndAlert(true);
       setGameEndResult(GAME_RESIGNATION[from.from].message);
       updateGameEndResults(GAME_RESIGNATION[from.from].result, gameId);
-      console.log(`${from.from} has resigned!`);
     });
   });
 

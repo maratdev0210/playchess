@@ -180,3 +180,20 @@ export const GAME_RESIGNATION: IGameResignation = {
     result: "1-0",
   },
 };
+
+type IMessage = {
+  [key: string]: string;
+};
+
+// in-game system messages
+// Example: White resigned, black resigned, white offered a draw, etc.. (the messages are displayed in the chat section)
+export interface IGameMessage {
+  [key: string]: IMessage;
+}
+
+export const GAME_MESSAGES: IGameMessage = {
+  resign: {
+    white: "White resigned",
+    black: "Black resigned",
+  },
+};

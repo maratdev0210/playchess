@@ -133,3 +133,7 @@
   -moz-box-shadow: 0px -6px 10px 0px rgba(181, 181, 181, 1);
   box-shadow: 0px -6px 10px 0px rgba(181, 181, 181, 1);
 }
+
+.scrollbar {
+  scrollbar-width: none;
+}
