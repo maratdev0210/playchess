@@ -41,6 +41,12 @@ app.prepare().then(() => {
       console.log(`${from} has resigned!`);
       socket.emit("resignation", from);
     });
+
+    // data: {username who send the message:, content: message}
+    socket.on("sendMessage", (data) => {
+      console.log(`${data.content}`);
+      io.emit("sendMessage", data);
+    });
   });
 
   httpServer

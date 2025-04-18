@@ -23,4 +23,5 @@ model Game {
   moves Json
   result String
   isActive Boolean 
+  messages Json?
 }
