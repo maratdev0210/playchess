@@ -24,8 +24,10 @@ export default function Chat({ username, gameId }: IChat) {
     socket.on("sendMessage", (data) => {
       const retrieveData = async () => {
         const gameData = await getGameData(gameId);
-        if (gameData.messages !== null) {
-          setMessages(gameData.messages);
+        if (gameData !== null) {
+          if (gameData.messages !== null) {
+            setMessages(gameData.messages);
+          }
         }
       };
 
@@ -41,9 +43,10 @@ export default function Chat({ username, gameId }: IChat) {
   useEffect(() => {
     const retrieveGameData = async () => {
       const gameData = await getGameData(gameId);
-
-      if (gameData.messages !== null) {
-        setMessages(gameData.messages);
+      if (gameData !== null) {
+        if (gameData.messages !== null) {
+          setMessages(gameData.messages);
+        }
       }
     };
 

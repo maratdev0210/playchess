@@ -13,6 +13,7 @@ model User {
   username String @unique
   password String
   friends Int[]
+  rating Int @default(1500)
 }
 
 model Game {

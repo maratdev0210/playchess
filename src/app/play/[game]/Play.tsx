@@ -25,6 +25,7 @@ import ChessBoardReversed from "@/app/ui/play/ChessBoardReversed";
 import GameAction from "@/app/ui/play/GameAction";
 import ManualGameEndAlert from "@/app/ui/play/ManualGameEndAlert";
 import updateGameEndResults from "@/app/actions/updateGameResults";
+import getRatingByUsername from "@/app/actions/getRatingByUsername";
 
 type IBoard = (Board | null)[][];
 const chess = new Chess(DEFAULT_POSITION, { skipValidation: false });
@@ -65,22 +66,29 @@ export default function Play({
     useState<IGameActionResponse | null>(null);
   const [showGameEndALert, setShowGameEndAlert] = useState<boolean>(false);
   const [gameEndResult, setGameEndResult] = useState<string>("");
+  const [playerRating, setPlayerRating] = useState<number>(0);
+  const [opponentRating, setOpponentRating] = useState<number>(0);
 
   useEffect(() => {
     const retrieveGameData = async () => {
       const result = await getGameData(gameId);
       const userData = await getUserData(userId);
       setUsername(userData.username);
+      setPlayerRating(userData.rating);
       // preload the moves that have been played if any
       if (result !== null && result.moves !== null) {
         setGameData(result);
-        setMessages(result.messages);
+  
         // change the board view if the user is playing for black
         if (userData.username === result.black) {
           setBoardView("black");
           setOpponentUsername(result.white);
+          const rating = await getRatingByUsername(result.white);
+          setOpponentRating(rating.rating);
         } else {
           setOpponentUsername(result.black);
+          const rating = await getRatingByUsername(result.black);
+          setOpponentRating(rating.rating);
         }
         const movesHistory = JSON.parse(result.moves);
 
@@ -342,6 +350,8 @@ export default function Play({
             boardView={boardView}
             setBoardView={setBoardView}
             setGameActionType={setGameActionType}
+            playerRating={playerRating}
+            opponentRating={opponentRating}
           />
         </div>
       </div>

@@ -15,6 +15,8 @@ interface IMovesHistory {
   boardView: string;
   setBoardView: React.Dispatch<React.SetStateAction<string>>;
   setGameActionType: React.Dispatch<React.SetStateAction<string>>; // choose the option to resign or offer the draw
+  playerRating: number;
+  opponentRating: number;
 }
 
 export default function MovesHistory({
@@ -26,14 +28,21 @@ export default function MovesHistory({
   boardView,
   setBoardView,
   setGameActionType,
+  playerRating,
+  opponentRating,
 }: IMovesHistory) {
   return (
     <>
-      <div className="h-40 w-60 py-2 md:h-75 md:w-90 border-1 border-none history rounded-lg">
+      <div className="w-60 py-2 md:h-90 md:w-90 border-1 border-none history rounded-lg">
         <div className="pb-2 px-4">
-          <Link href={`/arena/${opponent}`}>
-            <span className="text-gray-700 text-lg">{opponent}</span>
-          </Link>
+          <div className="flex flex-col">
+            <Link href={`/arena/${opponent}`}>
+              <span className="text-gray-700 text-lg">{opponent}</span>
+            </Link>
+            <span className="inline-block mt-1 text-gray-500">
+              {opponentRating}
+            </span>
+          </div>
         </div>
         <div className="w-full flex justify-center items-center gap-12 h-12 cursor-pointer bg-gray-100 *:hover:transition *:hover:duration-300 *:hover:text-gray-700 *:hover:scale-125">
           <div>
@@ -56,10 +65,16 @@ export default function MovesHistory({
             setActiveMove={setActiveMove}
           />
         </div>
-        <div className="pb-2 px-4 flex justify-between items-center gap-2">
-          <Link href={`/arena/${player}`}>
-            <span className="text-gray-700 text-lg">{player}</span>
-          </Link>
+        <div className="pb-2 px-4 flex justify-between gap-2">
+          <div className="flex flex-col">
+            <Link href={`/arena/${player}`}>
+              <span className="text-gray-700 text-lg">{player}</span>
+            </Link>
+            <span className="inline-block mt-1 text-gray-500">
+              {playerRating}
+            </span>
+          </div>
+
           <div className="flex gap-1">
             <div title="flip the board">
               <Repeat2
@@ -75,10 +90,7 @@ export default function MovesHistory({
                 className="text-gray-500 cursor-pointer scale-80 hover:transition hover:duration hover:scale-90"
               />
             </div>
-            <div
-              title="Offer draw relative"
-              onClick={() => setGameActionType("draw")}
-            >
+            <div title="Offer draw" onClick={() => setGameActionType("draw")}>
               <span className="cursor-pointer hover:transition hover:duration-300 hover:scale-105 relative bottom-0.5 font-semibold inline-block text-gray-500">
                 1
               </span>
