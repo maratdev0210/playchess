@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --color-boardWhite: #ebecd0;
+  --color-boardBlack: #739552;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

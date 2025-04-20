@@ -197,3 +197,7 @@ export const GAME_MESSAGES: IGameMessage = {
     black: "Black resigned",
   },
 };
+
+export const coordinates: string[] = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+export const ranks:number[] = [1, 2, 3, 4, 5, 6, 7, 8];
