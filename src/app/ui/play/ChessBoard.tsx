@@ -29,7 +29,6 @@ export default function ChessBoard({
   isInCheck,
   turn,
 }: IBoard) {
-  ranks.reverse();
   return (
     <>
       <div className="cursor-pointer  w-full flex items-center justify-center">

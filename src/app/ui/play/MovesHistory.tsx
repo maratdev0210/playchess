@@ -5,8 +5,10 @@ import ShowMoves from "@/app/widgets/play/ShowMoves";
 import { Move } from "chess.js";
 import Link from "next/link";
 import React from "react";
+import Clock from "./Clock";
 
 interface IMovesHistory {
+  gameId: string;
   history: Move[];
   activeMove: number | undefined;
   setActiveMove: React.Dispatch<React.SetStateAction<number | undefined>>;
@@ -17,9 +19,11 @@ interface IMovesHistory {
   setGameActionType: React.Dispatch<React.SetStateAction<string>>; // choose the option to resign or offer the draw
   playerRating: number;
   opponentRating: number;
+  side: string;
 }
 
 export default function MovesHistory({
+  gameId,
   history,
   activeMove,
   setActiveMove,
@@ -30,9 +34,14 @@ export default function MovesHistory({
   setGameActionType,
   playerRating,
   opponentRating,
+  side,
 }: IMovesHistory) {
   return (
     <>
+      <div>
+        <Clock gameId={gameId} player={opponent} side={side} />
+      </div>
+
       <div className="w-60 py-2 md:h-90 md:w-90 border-1 border-none history rounded-lg">
         <div className="pb-2 px-4">
           <div className="flex flex-col">
@@ -103,6 +112,9 @@ export default function MovesHistory({
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <Clock gameId={gameId} player={player} side={side} />
       </div>
     </>
   );

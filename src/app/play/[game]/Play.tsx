@@ -68,6 +68,7 @@ export default function Play({
   const [gameEndResult, setGameEndResult] = useState<string>("");
   const [playerRating, setPlayerRating] = useState<number>(0);
   const [opponentRating, setOpponentRating] = useState<number>(0);
+  const [side, setSide] = useState<string>("");
 
   useEffect(() => {
     const retrieveGameData = async () => {
@@ -78,7 +79,7 @@ export default function Play({
       // preload the moves that have been played if any
       if (result !== null && result.moves !== null) {
         setGameData(result);
-  
+
         // change the board view if the user is playing for black
         if (userData.username === result.black) {
           setBoardView("black");
@@ -118,6 +119,7 @@ export default function Play({
       setBoardPositions([...boardPositions, chess.board()]);
       setHistory(chess.history({ verbose: true }));
       setActiveMove(boardPositions.length);
+  
     });
 
     socket.on("blackMove", (move) => {
@@ -227,11 +229,13 @@ export default function Play({
               from: selectedPiecePosition,
               to: event.target.dataset.square,
             });
+            setSide("black");
           } else if (chess.turn() === "b") {
             socket.emit("blackMove", {
               from: selectedPiecePosition,
               to: event.target.dataset.square,
             });
+            setSide("white");
           }
           chess.move({
             from: selectedPiecePosition,
@@ -340,8 +344,9 @@ export default function Play({
             />
           )}
         </div>
-        <div className="flex justify-center right-8 top-8 md:top-0">
+        <div className="flex flex-col  justify-center right-8 top-8 md:top-0">
           <MovesHistory
+            gameId={gameId}
             history={history}
             activeMove={activeMove}
             setActiveMove={setActiveMove}
@@ -352,6 +357,7 @@ export default function Play({
             setGameActionType={setGameActionType}
             playerRating={playerRating}
             opponentRating={opponentRating}
+            side={side}
           />
         </div>
       </div>

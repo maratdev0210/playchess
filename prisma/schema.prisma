@@ -21,6 +21,8 @@ model Game {
   gameId String @unique
   white String 
   black String 
+  whiteTime Int @default(900)
+  blackTime Int @default(900)
   moves Json
   result String
   isActive Boolean 
