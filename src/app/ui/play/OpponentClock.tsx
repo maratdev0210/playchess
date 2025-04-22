@@ -9,22 +9,24 @@ import updateClocks from "@/app/actions/updateClocks";
 
 interface IClock {
   gameId: string;
-  playerSide: string | null;
+  opponentSide: string | null;
   side: string;
 }
 
-export default function Clock({ gameId, playerSide, side }: IClock) {
+export default function OpponentClock({ gameId, opponentSide, side }: IClock) {
   const [time, setTime] = useState<number | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const retrieveGameData = async () => {
       const result = await getGameData(gameId);
 
-      if (playerSide === "w") {
-        setTime(result.whiteTime);
-      } else {
-        setTime(result.blackTime);
+      if (result !== null) {
+        if (opponentSide === "b") {
+          setTime(result.blackTime);
+        } else {
+          setTime(result.whiteTime);
+        }
       }
     };
 
@@ -32,18 +34,14 @@ export default function Clock({ gameId, playerSide, side }: IClock) {
   }, []);
 
   const startTimer = () => {
-    if (time !== null && time > 0 && !intervalRef.current) {
-      intervalRef.current = setInterval(() => {
-        setTime((prevTime) => {
-          if (prevTime === 1) {
-            clearInterval(intervalRef.current!);
-            intervalRef.current = null;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
+    if (time !== null) {
+      if (time > 0 && !intervalRef.current) {
+        intervalRef.current = setInterval(() => {
+          setTime((prevTime) => prevTime - 1);
+        }, 1000);
+      }
 
-      const updatedClocks = updateClocks(gameId, playerSide, time);
+      const updatedClocks = updateClocks(gameId, opponentSide, time);
     }
   };
 
@@ -55,7 +53,7 @@ export default function Clock({ gameId, playerSide, side }: IClock) {
   };
 
   useEffect(() => {
-    if (playerSide === side) {
+    if (opponentSide === side) {
       startTimer();
     }
 
@@ -68,7 +66,7 @@ export default function Clock({ gameId, playerSide, side }: IClock) {
   });
 
   useEffect(() => {
-    if (playerSide !== side) {
+    if (opponentSide !== side) {
       stopTimer();
     }
   });
@@ -77,16 +75,16 @@ export default function Clock({ gameId, playerSide, side }: IClock) {
     <>
       {time !== null && (
         <div className="w-60 py-2">
-          <div className="w-24 justify-center py-2 px-1 flex border-1 shadow-md  text-black bg-white rounded-lg">
-            <div className="text-xl transition ease-in-out font-semibold">
+          <div className="w-24 justify-center py-2 px-1 flex border-1 shadow-md text-white bg-black rounded-lg">
+            <div className="text-xl transition ease-in-out">
               <span>{formatTime(time, 3600)}</span>
               <span>:</span>
             </div>
-            <div className="text-xl transition ease-in-out font-semibold">
+            <div className="text-xl transition ease-in-out">
               <span>{formatTime(time, 60)}</span>
               <span>:</span>
             </div>
-            <div className="text-xl transition ease-in-out font-semibold">
+            <div className="text-xl transition ease-in-out">
               <span>{formatSeconds(time)}</span>
             </div>
           </div>

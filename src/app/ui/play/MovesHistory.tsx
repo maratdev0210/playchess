@@ -6,6 +6,7 @@ import { Move } from "chess.js";
 import Link from "next/link";
 import React from "react";
 import Clock from "./Clock";
+import OpponentClock from "./OpponentClock";
 
 interface IMovesHistory {
   gameId: string;
@@ -20,6 +21,8 @@ interface IMovesHistory {
   playerRating: number;
   opponentRating: number;
   side: string;
+  playerSide: string | null;
+  opponentSide: string | null;
 }
 
 export default function MovesHistory({
@@ -35,11 +38,17 @@ export default function MovesHistory({
   playerRating,
   opponentRating,
   side,
+  playerSide,
+  opponentSide,
 }: IMovesHistory) {
   return (
     <>
       <div>
-        <Clock gameId={gameId} player={opponent} side={side} />
+        <OpponentClock
+          gameId={gameId}
+          opponentSide={opponentSide}
+          side={side}
+        />
       </div>
 
       <div className="w-60 py-2 md:h-90 md:w-90 border-1 border-none history rounded-lg">
@@ -114,7 +123,7 @@ export default function MovesHistory({
         </div>
       </div>
       <div>
-        <Clock gameId={gameId} player={player} side={side} />
+        <Clock gameId={gameId} playerSide={playerSide} side={side} />
       </div>
     </>
   );

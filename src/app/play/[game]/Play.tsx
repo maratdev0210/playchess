@@ -68,7 +68,8 @@ export default function Play({
   const [gameEndResult, setGameEndResult] = useState<string>("");
   const [playerRating, setPlayerRating] = useState<number>(0);
   const [opponentRating, setOpponentRating] = useState<number>(0);
-  const [side, setSide] = useState<string>("");
+  const [playerSide, setPlayerSide] = useState<string | null>(null);
+  const [opponentSide, setOpponentSide] = useState<string | null>(null);
 
   useEffect(() => {
     const retrieveGameData = async () => {
@@ -86,10 +87,14 @@ export default function Play({
           setOpponentUsername(result.white);
           const rating = await getRatingByUsername(result.white);
           setOpponentRating(rating.rating);
+          setPlayerSide("b");
+          setOpponentSide("w");
         } else {
           setOpponentUsername(result.black);
           const rating = await getRatingByUsername(result.black);
           setOpponentRating(rating.rating);
+          setPlayerSide("w");
+          setOpponentSide("b");
         }
         const movesHistory = JSON.parse(result.moves);
 
@@ -119,7 +124,6 @@ export default function Play({
       setBoardPositions([...boardPositions, chess.board()]);
       setHistory(chess.history({ verbose: true }));
       setActiveMove(boardPositions.length);
-  
     });
 
     socket.on("blackMove", (move) => {
@@ -229,13 +233,11 @@ export default function Play({
               from: selectedPiecePosition,
               to: event.target.dataset.square,
             });
-            setSide("black");
           } else if (chess.turn() === "b") {
             socket.emit("blackMove", {
               from: selectedPiecePosition,
               to: event.target.dataset.square,
             });
-            setSide("white");
           }
           chess.move({
             from: selectedPiecePosition,
@@ -357,7 +359,9 @@ export default function Play({
             setGameActionType={setGameActionType}
             playerRating={playerRating}
             opponentRating={opponentRating}
-            side={side}
+            side={chess.turn()}
+            playerSide={playerSide}
+            opponentSide={opponentSide}
           />
         </div>
       </div>
