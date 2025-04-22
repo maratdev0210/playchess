@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import getGameData from "@/app/actions/getGameData";
 import { formatTime, formatSeconds } from "@/lib/utils";
 import updateClocks from "@/app/actions/updateClocks";
@@ -11,9 +11,15 @@ interface IClock {
   gameId: string;
   opponentSide: string | null;
   side: string;
+  setLostOnTime: React.Dispatch<React.SetStateAction<string | null>>; // who lost on time (either white or black)
 }
 
-export default function OpponentClock({ gameId, opponentSide, side }: IClock) {
+export default function OpponentClock({
+  gameId,
+  opponentSide,
+  side,
+  setLostOnTime,
+}: IClock) {
   const [time, setTime] = useState<number | null>(null);
   const intervalRef = useRef(null);
 
@@ -44,6 +50,18 @@ export default function OpponentClock({ gameId, opponentSide, side }: IClock) {
       const updatedClocks = updateClocks(gameId, opponentSide, time);
     }
   };
+
+  useEffect(() => {
+    if (time !== null) {
+      if (time <= 0) {
+        if (opponentSide === "w") {
+          setLostOnTime("white");
+        } else {
+          setLostOnTime("black");
+        }
+      }
+    }
+  }, [time]);
 
   const stopTimer = () => {
     if (intervalRef.current) {

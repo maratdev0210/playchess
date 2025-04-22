@@ -70,6 +70,7 @@ export default function Play({
   const [opponentRating, setOpponentRating] = useState<number>(0);
   const [playerSide, setPlayerSide] = useState<string | null>(null);
   const [opponentSide, setOpponentSide] = useState<string | null>(null);
+  const [lostOnTime, setLostOnTime] = useState<string | null>(null); // who lost on time (either black or white)
 
   useEffect(() => {
     const retrieveGameData = async () => {
@@ -307,6 +308,20 @@ export default function Play({
   }, [gameActionResponse]);
 
   useEffect(() => {
+    if (lostOnTime !== null) {
+      if (lostOnTime === "white") {
+        socket.emit("resignation", {
+          from: "white",
+        });
+      } else {
+        socket.emit("resignation", {
+          from: "black",
+        });
+      }
+    }
+  }, [lostOnTime]);
+
+  useEffect(() => {
     // from shows which side resigned the game
     socket.on("resignation", (from) => {
       setShowGameEndAlert(true);
@@ -362,6 +377,7 @@ export default function Play({
             side={chess.turn()}
             playerSide={playerSide}
             opponentSide={opponentSide}
+            setLostOnTime={setLostOnTime}
           />
         </div>
       </div>

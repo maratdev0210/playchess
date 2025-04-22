@@ -23,6 +23,7 @@ interface IMovesHistory {
   side: string;
   playerSide: string | null;
   opponentSide: string | null;
+  setLostOnTime: React.Dispatch<React.SetStateAction<string | null>>; // who lost on time (either black or white)
 }
 
 export default function MovesHistory({
@@ -40,6 +41,7 @@ export default function MovesHistory({
   side,
   playerSide,
   opponentSide,
+  setLostOnTime,
 }: IMovesHistory) {
   return (
     <>
@@ -48,6 +50,7 @@ export default function MovesHistory({
           gameId={gameId}
           opponentSide={opponentSide}
           side={side}
+          setLostOnTime={setLostOnTime}
         />
       </div>
 
@@ -123,7 +126,12 @@ export default function MovesHistory({
         </div>
       </div>
       <div>
-        <Clock gameId={gameId} playerSide={playerSide} side={side} />
+        <Clock
+          gameId={gameId}
+          playerSide={playerSide}
+          side={side}
+          setLostOnTime={setLostOnTime}
+        />
       </div>
     </>
   );
