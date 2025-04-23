@@ -200,4 +200,26 @@ export const GAME_MESSAGES: IGameMessage = {
 
 export const coordinates: string[] = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-export const ranks:number[] = [1, 2, 3, 4, 5, 6, 7, 8];
+export const ranks: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
+
+export interface IGameControl {
+  [format: string]: number; // time control, e.g. blitz3 -> 3 + 0 game (180 seconds)
+}
+
+export const TIME_CONTROL: IGameControl[] = [
+  {
+    bullet: 60,
+  },
+  {
+    blitz3: 180,
+  },
+  {
+    blitz5: 300,
+  },
+  {
+    rapid: 600,
+  },
+  {
+    classical: 1800,
+  },
+];

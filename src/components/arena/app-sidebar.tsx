@@ -36,6 +36,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import gamesCount from "@/app/actions/gamesCount";
 import createGame from "@/app/actions/createGame";
+import Invitation from "@/app/ui/arena/Invitation";
 
 // define the type returned by calling the getFriendsListName function
 interface IFriendsList {
@@ -60,6 +61,8 @@ export function AppSidebar({ id }: { id: number }) {
   const [invitedPlayerUsername, setInvitedPlayerUsername] =
     useState<string>("");
   const dispatch = useAppDispatch();
+  const [isInvitationOpen, setIsInvitationOpen] = useState<boolean>(false);
+  const [opponent, setOpponent] = useState<string>(""); // who do we invite for a game
 
   useEffect(() => {
     const retrieveFriendsList = async () => {
@@ -104,18 +107,23 @@ export function AppSidebar({ id }: { id: number }) {
     await logout();
   };
 
-  const handleInvitationClick = async (
-    friendName: string,
-    friendId: number
-  ) => {
-    setInvitedPlayerId(friendId);
-    setInvitedPlayerUsername(friendName);
-    const invitation: Invitation = {
-      from: inviterUsername,
-      to: friendName,
-    };
-    socket.emit("invitation", invitation);
+  const handleInvitationClick = (opponentName: string) => {
+    setOpponent(opponentName);
+    setIsInvitationOpen(true);
   };
+
+  // const handleInvitationClick = async (
+  //   friendName: string,
+  //   friendId: number
+  // ) => {
+  //   setInvitedPlayerId(friendId);
+  //   setInvitedPlayerUsername(friendName);
+  //   const invitation: Invitation = {
+  //     from: inviterUsername,
+  //     to: friendName,
+  //   };
+  //   socket.emit("invitation", invitation);
+  // };
 
   useEffect(() => {
     socket.on("replyToInvitation", (reply) => {
@@ -125,91 +133,102 @@ export function AppSidebar({ id }: { id: number }) {
   });
 
   return (
-    <Sidebar className="top-16 !h-[calc(100svh-32)]">
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Playchess</span>
-                  <span className="truncate text-xs">Live server</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
+    <>
+      <Invitation
+        isOpen={isInvitationOpen}
+        setIsOpen={setIsInvitationOpen}
+        opponent={opponent}
+      />
+
+      <Sidebar className="top-16 !h-[calc(100svh-32)]">
+        <SidebarHeader>
           <SidebarMenu>
-            <Collapsible className="group/collapsible">
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton>
-                    <Settings />
-                    <Link href="/profile/settings">Settings</Link>
-                    <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
-                    <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-              </SidebarMenuItem>
-            </Collapsible>
-            <Collapsible className="group/collapsible">
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton>
-                    <UsersRound />
-                    Friends
-                    <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
-                    <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                {friendsListName?.length ? (
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {friendsListName.map((friend, index) => {
-                        return (
-                          <SidebarMenuSubItem key={index}>
-                            <SidebarMenuSubButton asChild>
-                              <div className="flex justify-between">
-                                <Link href={`/arena/${friend.username}`}>
-                                  <span className="text-sm cursor-pointer hover:text-blue-500 hover:transition hover:duration-300">
-                                    {friend.username}
-                                  </span>
-                                </Link>
-                                <Swords
-                                  onClick={() =>
-                                    handleInvitationClick(
-                                      friend.username,
-                                      friendsList[index]
-                                    )
-                                  }
-                                  className="cursor-pointer"
-                                />
-                              </div>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        );
-                      })}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                ) : null}
-              </SidebarMenuItem>
-            </Collapsible>
-            <Collapsible className="group/collapsible">
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton onClick={() => handleLogout()}>
-                    <LogOut className="hover:cursor-pointer" />
-                    <span className="hover:cursor-pointer">Log out</span>
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-              </SidebarMenuItem>
-            </Collapsible>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg" asChild>
+                <a href="#">
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">Playchess</span>
+                    <span className="truncate text-xs">Live server</span>
+                  </div>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarMenu>
+              <Collapsible className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <Settings />
+                      <Link href="/profile/settings">Settings</Link>
+                      <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
+                      <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                </SidebarMenuItem>
+              </Collapsible>
+              <Collapsible className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <UsersRound />
+                      Friends
+                      <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
+                      <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  {friendsListName?.length ? (
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {friendsListName.map((friend, index) => {
+                          return (
+                            <SidebarMenuSubItem key={index}>
+                              <SidebarMenuSubButton asChild>
+                                <div className="flex justify-between">
+                                  <Link href={`/arena/${friend.username}`}>
+                                    <span className="text-sm cursor-pointer hover:text-blue-500 hover:transition hover:duration-300">
+                                      {friend.username}
+                                    </span>
+                                  </Link>
+                                  <Swords
+                                    // onClick={() =>
+                                    //   handleInvitationClick(
+                                    //     friend.username,
+                                    //     friendsList[index]
+                                    //   )
+                                    // }
+                                    onClick={() =>
+                                      handleInvitationClick(friend.username)
+                                    }
+                                    className="cursor-pointer"
+                                  />
+                                </div>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          );
+                        })}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  ) : null}
+                </SidebarMenuItem>
+              </Collapsible>
+              <Collapsible className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton onClick={() => handleLogout()}>
+                      <LogOut className="hover:cursor-pointer" />
+                      <span className="hover:cursor-pointer">Log out</span>
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                </SidebarMenuItem>
+              </Collapsible>
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </>
   );
 }
