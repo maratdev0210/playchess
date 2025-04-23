@@ -202,24 +202,40 @@ export const coordinates: string[] = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 export const ranks: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
+type IGameControlDescription = {
+  time: number;
+  title: string;
+};
+
 export interface IGameControl {
-  [format: string]: number; // time control, e.g. blitz3 -> 3 + 0 game (180 seconds)
+  [format: string]: IGameControlDescription[]; // format: [bullet | blitz | rapid]
 }
 
-export const TIME_CONTROL: IGameControl[] = [
-  {
-    bullet: 60,
-  },
-  {
-    blitz3: 180,
-  },
-  {
-    blitz5: 300,
-  },
-  {
-    rapid: 600,
-  },
-  {
-    classical: 1800,
-  },
-];
+export const TIME_CONTROL: IGameControl = {
+  bullet: [
+    {
+      time: 60,
+      title: "1+0",
+    },
+  ],
+  blitz: [
+    {
+      time: 180,
+      title: "3+0",
+    },
+    {
+      time: 300,
+      title: "5+0",
+    },
+  ],
+  rapid: [
+    {
+      time: 600,
+      title: "10+0",
+    },
+    {
+      time: 900,
+      title: "15+0",
+    },
+  ],
+};

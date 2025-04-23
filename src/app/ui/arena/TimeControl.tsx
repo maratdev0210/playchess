@@ -14,25 +14,39 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TIME_CONTROL } from "@/types/play";
+import React from "react";
 
-export default function TimeControl() {
+interface ITimeControl {
+  setTimeControl: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export default function TimeControl({ setTimeControl }: ITimeControl) {
+    
   return (
-    <Select>
-      <SelectTrigger className="w-[180px]">
+    <Select onValueChange={(time) => setTimeControl(parseInt(time))}>
+      <SelectTrigger  className="w-[180px]">
         <SelectValue placeholder="Select time control" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Time Control</SelectLabel>
-          {TIME_CONTROL.map((control) => {
-            return Object.keys(control).map((time, index) => {
+          {Object.keys(TIME_CONTROL).map((control) => {
+            return TIME_CONTROL[control].map((controlProps, index) => {
               return (
                 <SelectItem
-                  className="text-black"
+                  className="text-black cursor-pointer"
                   key={index}
-                  value={String(control[time])}
+                  value={String(controlProps.time)}
+                 
                 >
-                  {control[time]}
+                  <div className="flex justify-between w-36">
+                    <span className="font-semibold inline-block">
+                      {control}
+                    </span>
+                    <span className="font-semibold inline-block">
+                      {controlProps.title}
+                    </span>
+                  </div>
                 </SelectItem>
               );
             });

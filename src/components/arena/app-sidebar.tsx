@@ -45,9 +45,10 @@ interface IFriendsList {
 
 // object representing the invitation for the game
 // { to: request to the user with whom you want to play}
-interface Invitation {
+interface IInvitation {
   from: string | null;
   to: string;
+  time: number;
 }
 
 export function AppSidebar({ id }: { id: number }) {
@@ -63,6 +64,9 @@ export function AppSidebar({ id }: { id: number }) {
   const dispatch = useAppDispatch();
   const [isInvitationOpen, setIsInvitationOpen] = useState<boolean>(false);
   const [opponent, setOpponent] = useState<string>(""); // who do we invite for a game
+  const [opponentId, setOpponentId] = useState<number>(0);
+  const [timeControl, setTimeControl] = useState<number>(0);
+  const [isInvited, setIsInvited] = useState<boolean>(false);
 
   useEffect(() => {
     const retrieveFriendsList = async () => {
@@ -107,8 +111,9 @@ export function AppSidebar({ id }: { id: number }) {
     await logout();
   };
 
-  const handleInvitationClick = (opponentName: string) => {
-    setOpponent(opponentName);
+  const handleInvitationClick = (friendName: string, friendId: number) => {
+    setOpponent(friendName);
+    setOpponentId(friendId);
     setIsInvitationOpen(true);
   };
 
@@ -132,12 +137,34 @@ export function AppSidebar({ id }: { id: number }) {
     });
   });
 
+  useEffect(() => {
+    if (isInvited) {
+      const inviteFriend = async () => {
+        setInvitedPlayerId(opponentId);
+        setInvitedPlayerUsername(opponent);
+
+        const invitation: IInvitation = {
+          from: inviterUsername,
+          to: opponent,
+          time: timeControl,
+        };
+        console.log("inviting", invitation);
+        socket.emit("invitation", invitation);
+      };
+      setIsInvited(false);
+
+      inviteFriend();
+    }
+  }, [isInvited]);
+
   return (
     <>
       <Invitation
         isOpen={isInvitationOpen}
         setIsOpen={setIsInvitationOpen}
         opponent={opponent}
+        setTimeControl={setTimeControl}
+        setIsInvited={setIsInvited}
       />
 
       <Sidebar className="top-16 !h-[calc(100svh-32)]">
@@ -201,7 +228,10 @@ export function AppSidebar({ id }: { id: number }) {
                                     //   )
                                     // }
                                     onClick={() =>
-                                      handleInvitationClick(friend.username)
+                                      handleInvitationClick(
+                                        friend.username,
+                                        friendsList[index]
+                                      )
                                     }
                                     className="cursor-pointer"
                                   />

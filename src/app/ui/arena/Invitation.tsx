@@ -8,18 +8,29 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import TimeControl from "./TimeControl";
+import React from "react";
 
 interface IInvitation {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   opponent: string;
+  setTimeControl: React.Dispatch<React.SetStateAction<number>>;
+  setIsInvited: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function Invitation({
   isOpen,
   setIsOpen,
   opponent,
+  setTimeControl,
+  setIsInvited,
 }: IInvitation) {
+
+  const handleInvitation = () => {
+    setIsOpen(false);
+    setIsInvited(true);
+  }
+ 
   return (
     <>
       <div>
@@ -31,7 +42,7 @@ export default function Invitation({
                 Invite <span className="font-semibold">{opponent}</span> for a
                 game!
                 <div className="mt-8">
-                  <TimeControl />
+                  <TimeControl setTimeControl={setTimeControl} />
                 </div>
               </div>
               <div className="flex gap-2">
@@ -42,7 +53,10 @@ export default function Invitation({
                 >
                   Cancel
                 </Button>
-                <Button className="bg-black text-white shadow-md cursor-pointer">
+                <Button
+                  onClick={() => handleInvitation()}
+                  className="bg-black text-white shadow-md cursor-pointer"
+                >
                   Invite
                 </Button>
               </div>
