@@ -18,6 +18,8 @@ interface IGameEndAlert {
   showMessage: boolean;
   setShowMessage: React.Dispatch<React.SetStateAction<boolean>>;
   setPlayAgain: React.Dispatch<React.SetStateAction<boolean>>;
+  showAlternativeText: boolean;
+  alternativeText: string | null;
 }
 
 export default function GameEndAlert({
@@ -25,6 +27,8 @@ export default function GameEndAlert({
   showMessage,
   setShowMessage,
   setPlayAgain,
+  alternativeText,
+  showAlternativeText,
 }: IGameEndAlert) {
   return (
     <>
@@ -34,7 +38,13 @@ export default function GameEndAlert({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{text}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {showAlternativeText ? (
+                <span>{alternativeText}</span>
+              ) : (
+                <span>{text}</span>
+              )}
+            </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>

@@ -39,13 +39,18 @@ app.prepare().then(() => {
 
     socket.on("resignation", (from) => {
       console.log(`${from} has resigned!`);
-      socket.emit("resignation", from);
+      socket.broadcast.emit("resignation", from);
     });
 
     // data: {username who send the message:, content: message}
     socket.on("sendMessage", (data) => {
       console.log(`${data.content}`);
       io.emit("sendMessage", data);
+    });
+
+    socket.on("lostOnTime", (from) => {
+      console.log(`${from} has lost on time!`);
+      socket.broadcast.emit("lostOnTime", from);
     });
   });
 

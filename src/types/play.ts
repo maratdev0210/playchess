@@ -3,6 +3,9 @@
 // And other chess-related stuff
 
 import { PieceSymbol, Color, Square } from "chess.js";
+import { Zap } from "lucide-react";
+import { LucideProps } from "lucide-react";
+import { ReactNode } from "react";
 
 export const DEFAULT_POSITION: string =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -177,6 +180,17 @@ export const GAME_RESIGNATION: IGameResignation = {
   },
   black: {
     message: "White won by resignation!",
+    result: "1-0",
+  },
+};
+
+export const GAME_LOST_ON_TIME: IGameResignation = {
+  white: {
+    message: "Black won by white losing on time!",
+    result: "0-1",
+  },
+  black: {
+    message: "White won by black losing on time!",
     result: "1-0",
   },
 };

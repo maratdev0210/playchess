@@ -21,10 +21,9 @@ interface ITimeControl {
 }
 
 export default function TimeControl({ setTimeControl }: ITimeControl) {
-    
   return (
     <Select onValueChange={(time) => setTimeControl(parseInt(time))}>
-      <SelectTrigger  className="w-[180px]">
+      <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select time control" />
       </SelectTrigger>
       <SelectContent>
@@ -37,13 +36,12 @@ export default function TimeControl({ setTimeControl }: ITimeControl) {
                   className="text-black cursor-pointer"
                   key={index}
                   value={String(controlProps.time)}
-                 
                 >
                   <div className="flex justify-between w-36">
-                    <span className="font-semibold inline-block">
+                    <span className="font-semibold inline-block first-letter:capitalize">
                       {control}
                     </span>
-                    <span className="font-semibold inline-block">
+                    <span className="font-semibold inline-block first-letter:capitalize">
                       {controlProps.title}
                     </span>
                   </div>

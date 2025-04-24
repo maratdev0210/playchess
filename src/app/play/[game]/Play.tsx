@@ -18,7 +18,7 @@ import ChessBoard from "@/app/ui/play/ChessBoard";
 import MovesHistory from "@/app/ui/play/MovesHistory";
 import GameEndAlert from "@/app/ui/play/GameEndAlert";
 import { useGameState } from "@/lib/useGameState";
-import { SOUNDS, IGameActionResponse, GAME_RESIGNATION } from "@/types/play";
+import { SOUNDS, IGameActionResponse, GAME_RESIGNATION, GAME_LOST_ON_TIME } from "@/types/play";
 import updateGame from "@/app/actions/updateGame";
 import { socket } from "@/socket";
 import ChessBoardReversed from "@/app/ui/play/ChessBoardReversed";
@@ -71,6 +71,11 @@ export default function Play({
   const [playerSide, setPlayerSide] = useState<string | null>(null);
   const [opponentSide, setOpponentSide] = useState<string | null>(null);
   const [lostOnTime, setLostOnTime] = useState<string | null>(null); // who lost on time (either black or white)
+  const [alternativeGameEndMessage, setAlternativeGameEndMessage] = useState<
+    string | null
+  >(null); // game end messages that are being shown after the player either resigns or loses on time
+  const [showAlternativeText, setShowAlternativeText] =
+    useState<boolean>(false); // display the alternative text only when the player manually resigns, or loses on time
 
   useEffect(() => {
     const retrieveGameData = async () => {
@@ -330,6 +335,28 @@ export default function Play({
     });
   });
 
+  useEffect(() => {
+    // from shows which side lost on time
+    socket.on("lostOnTime", (from) => {
+      setShowGameEndAlert(true);
+      setGameEndResult(GAME_LOST_ON_TIME[from.from].message);
+      updateGameEndResults(GAME_LOST_ON_TIME[from.from].result, gameId);
+    });
+  });
+
+  useEffect(() => {
+    if (lostOnTime !== null) {
+      if (lostOnTime[0] === playerSide) {
+        setShowMessage(true);
+        setShowAlternativeText(true);
+        setAlternativeGameEndMessage(`${lostOnTime} has lost on time!`);
+        socket.emit("lostOnTime", {
+          from: playerSide, // shows who lost on time
+        });
+      }
+    }
+  }, [lostOnTime]);
+
   console.log(boardPositions);
   console.log(isHistory);
   console.log(activeMove);
@@ -386,6 +413,8 @@ export default function Play({
       <GameEndAlert
         showMessage={showMessage}
         text={gameEndMessage}
+        alternativeText={alternativeGameEndMessage}
+        showAlternativeText={showAlternativeText}
         setShowMessage={setShowMessage}
         setPlayAgain={setPlayAgain}
       />

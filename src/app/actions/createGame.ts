@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 export default async function createGame(
   white: string,
   black: string,
+  time: number,
   gameId: string
 ) {
   try {
@@ -18,6 +19,8 @@ export default async function createGame(
         moves: {},
         result: "",
         isActive: true,
+        whiteTime: time,
+        blackTime: time,
       },
     });
 

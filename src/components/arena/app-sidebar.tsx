@@ -25,15 +25,12 @@ import getFriendsListByName from "@/app/actions/getFriendsListByName";
 import Link from "next/link";
 import { socket } from "../../socket";
 import {
-  selectPlayersData,
   setInvitedPlayerData,
 } from "@/lib/state/features/players/playersSlice";
 import { useAppDispatch } from "@/lib/state/hooks";
-import { useAppSelector } from "@/lib/state/hooks";
 import getUserData from "@/app/actions/getUserData";
 import { logout } from "@/app/actions/auth";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
 import gamesCount from "@/app/actions/gamesCount";
 import createGame from "@/app/actions/createGame";
 import Invitation from "@/app/ui/arena/Invitation";
@@ -96,6 +93,7 @@ export function AppSidebar({ id }: { id: number }) {
           const newGame = await createGame(
             inviterUsername,
             invitedPlayerUsername,
+            timeControl,
             String(gameId)
           );
           console.log(newGame);
@@ -117,23 +115,9 @@ export function AppSidebar({ id }: { id: number }) {
     setIsInvitationOpen(true);
   };
 
-  // const handleInvitationClick = async (
-  //   friendName: string,
-  //   friendId: number
-  // ) => {
-  //   setInvitedPlayerId(friendId);
-  //   setInvitedPlayerUsername(friendName);
-  //   const invitation: Invitation = {
-  //     from: inviterUsername,
-  //     to: friendName,
-  //   };
-  //   socket.emit("invitation", invitation);
-  // };
-
   useEffect(() => {
     socket.on("replyToInvitation", (reply) => {
       setInvitationReply(reply.answer);
-      console.log("received the reply");
     });
   });
 
@@ -148,7 +132,6 @@ export function AppSidebar({ id }: { id: number }) {
           to: opponent,
           time: timeControl,
         };
-        console.log("inviting", invitation);
         socket.emit("invitation", invitation);
       };
       setIsInvited(false);
@@ -221,12 +204,6 @@ export function AppSidebar({ id }: { id: number }) {
                                     </span>
                                   </Link>
                                   <Swords
-                                    // onClick={() =>
-                                    //   handleInvitationClick(
-                                    //     friend.username,
-                                    //     friendsList[index]
-                                    //   )
-                                    // }
                                     onClick={() =>
                                       handleInvitationClick(
                                         friend.username,
